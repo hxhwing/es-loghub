@@ -55,7 +55,7 @@ steps:
 
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   id: Get ES and Kibana endpoint
-  entrypoint: /bin/sh
+  entrypoint: /bin/bash
   args:
   - '-c'
   - |
