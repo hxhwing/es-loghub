@@ -60,7 +60,7 @@ steps:
   - '-c'
   - |
     source init.conf
-    gcloud container clusters get-credentials $cluster_name
+    gcloud container clusters get-credentials $cluster_name --region $region
     password=$(kubectl get secret escluster-es-elastic-user -n es -o go-template='{{.data.elastic | base64decode }}')
     es_ip=$(kubectl get svc escluster-es-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     es_endpoint="https://$es_ip:9200"
