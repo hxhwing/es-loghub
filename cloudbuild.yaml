@@ -53,7 +53,7 @@ steps:
       terraform apply --auto-approve
       echo $cluster_name > /workspace/cluster_name
 
-- name: 'hashicorp/terraform:1.0.0'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   id: Get ES and Kibana endpoint
   entrypoint: /bin/sh
   args:
