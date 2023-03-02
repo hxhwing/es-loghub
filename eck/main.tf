@@ -2,7 +2,7 @@
 # Creating and attaching the node-pool to the Kubernetes Cluster
 resource "google_container_node_pool" "node-pool" {
   name               = var.nodepool_name
-  cluster            = google_container_cluster.escluster.id
+  cluster            = var.cluster_name
   initial_node_count = var.node_count
 
   node_config {
@@ -77,7 +77,7 @@ resource "time_sleep" "sleep30s" {
 
 
 data "kubectl_file_documents" "sc" {
-    content = file("eck/storageclass.yaml")
+    content = file("eck/manifests/storageclass.yaml")
 }
 
 resource "kubectl_manifest" "storageclass" {
@@ -87,7 +87,7 @@ resource "kubectl_manifest" "storageclass" {
 }
 
 data "kubectl_file_documents" "es" {
-    content = file("eck/elasticsearch.yaml")
+    content = file("eck/manifests/elasticsearch.yaml")
 }
 
 # Deploy Elasticsearch 
@@ -101,7 +101,7 @@ resource "kubectl_manifest" "elasticsearch" {
 }
 
 data "kubectl_file_documents" "kb" {
-    content = file("eck/kibana.yaml")
+    content = file("eck/manifests/kibana.yaml")
 }
 
 # Deploy Kibana 
