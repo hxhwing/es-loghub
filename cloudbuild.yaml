@@ -1,0 +1,53 @@
+
+# [START cloudbuild]
+steps:
+# Check whether create new GKE clsuter
+- name: 'hashicorp/terraform:1.0.0'
+  id: GKE
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+      source init.conf
+      if [ "$create_new_cluster" == "true" ]; then
+        sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" gke/providers.tf
+        sed -i "s/REGION_ID/$region/g" gke/variables.tf
+        sed -i "s/NEW_CLUSTER_NAME/$cluster_name/g" gke/variables.tf
+        cd gke
+        terraform init
+        terraform apply --auto-approve
+      else
+        echo "*************** No need to create new GKE cluster ******************"
+      fi
+
+# Create new node pool, and deploy all Elasitcsearch components
+- name: 'hashicorp/terraform:1.0.0'
+  id: ECK
+  waitFor:
+  - GKE
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+      source init.conf
+      echo "Generating manifest of node pool"
+      sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" eck/providers.tf
+      sed -i "s/REGION_ID/$region/g" eck/terraform.tfvars
+      sed -i "s/NEW_CLUSTER_NAME/$cluster_name/g" eck/terraform.tfvars
+      sed -i "s/INSTANCE_TYPE/$instance_type/g" eck/terraform.tfvars
+      sed -i "s/INITIAL_NODE_COUNT/$node_count/g" eck/terraform.tfvars
+      echo "Generating manifest of Elasticsearch"
+      sed -i "s/NAMESPACE/$namespace/g" eck/manifests/elasticsearch.yaml
+      sed -i "s/ELASTICSEARCH_VERSION/$elasticsearch_version/g" eck/manifests/elasticsearch.yaml
+      sed -i "s/MASTER_NODE_COUNT/$master_node_count/g" eck/manifests/elasticsearch.yaml
+      sed -i "s/HOT_NODE_COUNT/$hot_node_count/g" eck/manifests/elasticsearch.yaml
+      sed -i "s/HOT_STORAGE_SIZE/$hot_storage_size/g" eck/manifests/elasticsearch.yaml
+      sed -i "s/WARM_NODE_COUNT/$warm_node_count/g" eck/manifests/elasticsearch.yaml
+      sed -i "s/WARM_STORAGE_SIZE/$warm_storage_size/g" eck/manifests/elasticsearch.yaml
+      sed -i "s/NAMESPACE/$namespace/g" eck/manifests/kibana.yaml
+      sed -i "s/KIBANA_VERSION/$kibana_version/g" eck/manifests/kibana.yaml
+      cd eck
+      terraform init
+      terraform apply --auto-approve
+
+# [END cloudbuild-trigger-cd]
