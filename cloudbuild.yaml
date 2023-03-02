@@ -12,6 +12,7 @@ steps:
       if [ "$create_new_cluster" == "true" ]; then
         sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" gke/providers.tf
         sed -i "s/REGION_ID/$region/g" gke/variables.tf
+        sed -i "s/PROJECT_ID/$PROJECT_ID/g" gke/variables.tf
         sed -i "s/NEW_CLUSTER_NAME/$cluster_name/g" gke/variables.tf
         cd gke
         terraform init
@@ -32,10 +33,11 @@ steps:
       source init.conf
       echo "Generating manifest of node pool"
       sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" eck/providers.tf
-      sed -i "s/REGION_ID/$region/g" eck/terraform.tfvars
-      sed -i "s/NEW_CLUSTER_NAME/$cluster_name/g" eck/terraform.tfvars
-      sed -i "s/INSTANCE_TYPE/$instance_type/g" eck/terraform.tfvars
-      sed -i "s/INITIAL_NODE_COUNT/$node_count/g" eck/terraform.tfvars
+      sed -i "s/REGION_ID/$region/g" eck/variables.tf
+      sed -i "s/PROJECT_ID/$PROJECT_ID/g" eck/variables.tf
+      sed -i "s/NEW_CLUSTER_NAME/$cluster_name/g" eck/variables.tf
+      sed -i "s/INSTANCE_TYPE/$instance_type/g" eck/variables.tf
+      sed -i "s/INITIAL_NODE_COUNT/$node_count/g" eck/variables.tf
       echo "Generating manifest of Elasticsearch"
       sed -i "s/NAMESPACE/$namespace/g" eck/manifests/elasticsearch.yaml
       sed -i "s/ELASTICSEARCH_VERSION/$elasticsearch_version/g" eck/manifests/elasticsearch.yaml
