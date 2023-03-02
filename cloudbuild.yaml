@@ -55,7 +55,7 @@ steps:
 
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Get ES and Kibana endpoint
-  entrypoint: sh
+  entrypoint: /bin/bash
   args:
   - '-c'
   - |
