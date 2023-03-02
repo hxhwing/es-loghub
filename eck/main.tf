@@ -4,23 +4,24 @@ resource "google_container_node_pool" "node-pool" {
   name               = var.nodepool_name
   cluster            = var.cluster_name
   initial_node_count = var.node_count
+  location           = var.region
 
   node_config {
     preemptible  = false
     machine_type = var.instance_type
     labels = {
-      "app"                     = "elasticsearch"
+      "app" = "elasticsearch"
     }
   }
 
   management {
-    auto_repair = true
+    auto_repair  = true
     auto_upgrade = true
   }
 
   autoscaling {
-    min_node_count = 1
-    max_node_count = 2
+    min_node_count  = 1
+    max_node_count  = 2
     location_policy = "BALANCED"
   }
 }
@@ -77,40 +78,40 @@ resource "time_sleep" "sleep30s" {
 
 
 data "kubectl_file_documents" "sc" {
-    content = file("manifests/storageclass.yaml")
+  content = file("manifests/storageclass.yaml")
 }
 
 resource "kubectl_manifest" "storageclass" {
-  for_each  = data.kubectl_file_documents.sc.manifests
-  yaml_body = each.value
+  for_each   = data.kubectl_file_documents.sc.manifests
+  yaml_body  = each.value
   depends_on = [google_container_node_pool.node-pool]
 }
 
 data "kubectl_file_documents" "es" {
-    content = file("manifests/elasticsearch.yaml")
+  content = file("manifests/elasticsearch.yaml")
 }
 
 # Deploy Elasticsearch 
 resource "kubectl_manifest" "elasticsearch" {
-  for_each  = data.kubectl_file_documents.es.manifests
-  yaml_body = each.value
+  for_each   = data.kubectl_file_documents.es.manifests
+  yaml_body  = each.value
   depends_on = [helm_release.elastic, kubectl_manifest.storageclass, time_sleep.sleep30s]
   provisioner "local-exec" {
-     command = "sleep 30"
+    command = "sleep 30"
   }
 }
 
 data "kubectl_file_documents" "kb" {
-    content = file("manifests/kibana.yaml")
+  content = file("manifests/kibana.yaml")
 }
 
 # Deploy Kibana 
 resource "kubectl_manifest" "kibana" {
-  for_each  = data.kubectl_file_documents.kb.manifests
-  yaml_body = each.value
+  for_each   = data.kubectl_file_documents.kb.manifests
+  yaml_body  = each.value
   depends_on = [helm_release.elastic, kubectl_manifest.elasticsearch]
   provisioner "local-exec" {
-     command = "sleep 30"
+    command = "sleep 30"
   }
 }
 

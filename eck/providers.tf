@@ -1,19 +1,19 @@
 terraform {
   backend "gcs" {
-    bucket  = "BACKEND_BUCKET_NAME"
-    prefix  = "terraform/state/eck"
+    bucket = "BACKEND_BUCKET_NAME"
+    prefix = "terraform/state/eck"
   }
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "4.55.0"
     }
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = "2.18.1"
     }
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
       version = "2.9.0"
     }
     kubectl = {
@@ -24,8 +24,8 @@ terraform {
 }
 
 provider "google" {
-  region      = var.region
-  project     = var.project
+  region  = var.region
+  project = var.project
 }
 
 data "google_client_config" "default" {}
