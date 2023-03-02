@@ -52,4 +52,18 @@ steps:
       terraform init
       terraform apply --auto-approve
 
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: Get ES and Kibana endpoint
+  entrypoint: /bin/sh
+  args:
+  - '-c'
+  - |
+    source init.conf
+    gcloud container clusters get-credentials $cluster_name
+    password=$(kubectl get secret escluster-es-elastic-user -n es -o go-template='{{.data.elastic | base64decode }}')
+    es_ip=$(kubectl get svc escluster-es-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
+    es_endpoint="https://$es_ip:9200"
+    kibana_ip=$(kubectl get svc kibana-kb-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
+    kibana_endpoint="https://$kibana_ip:5601"
+    echo === "Access Kibana UI through: ${kibana_endpoint}" ===
 # [END cloudbuild-trigger-cd]
