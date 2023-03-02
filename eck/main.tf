@@ -51,7 +51,7 @@ resource "google_container_node_pool" "node-pool" {
 #     api_group = "rbac.authorization.k8s.io"
 #   }
 
-#   depends_on = [google_container_cluster.escluster, google_container_node_pool.node-pool]
+#   depends_on = [google_container_node_pool.node-pool]
 # }
 
 # Install ECK operator via helm-charts
@@ -63,7 +63,7 @@ resource "helm_release" "elastic" {
   namespace        = "elastic-system"
   create_namespace = "true"
 
-  depends_on = [google_container_cluster.escluster, google_container_node_pool.node-pool]
+  depends_on = [google_container_node_pool.node-pool]
 
 }
 
@@ -77,17 +77,17 @@ resource "time_sleep" "sleep30s" {
 
 
 data "kubectl_file_documents" "sc" {
-    content = file("eck/manifests/storageclass.yaml")
+    content = file("manifests/storageclass.yaml")
 }
 
 resource "kubectl_manifest" "storageclass" {
   for_each  = data.kubectl_file_documents.sc.manifests
   yaml_body = each.value
-  depends_on = [google_container_cluster.escluster, google_container_node_pool.node-pool]
+  depends_on = [google_container_node_pool.node-pool]
 }
 
 data "kubectl_file_documents" "es" {
-    content = file("eck/manifests/elasticsearch.yaml")
+    content = file("manifests/elasticsearch.yaml")
 }
 
 # Deploy Elasticsearch 
@@ -101,7 +101,7 @@ resource "kubectl_manifest" "elasticsearch" {
 }
 
 data "kubectl_file_documents" "kb" {
-    content = file("eck/manifests/kibana.yaml")
+    content = file("manifests/kibana.yaml")
 }
 
 # Deploy Kibana 

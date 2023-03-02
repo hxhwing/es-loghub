@@ -3,7 +3,7 @@
 steps:
 # Check whether create new GKE clsuter
 - name: 'hashicorp/terraform:1.0.0'
-  id: GKE
+  id: Create new GKE
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -23,9 +23,9 @@ steps:
 
 # Create new node pool, and deploy all Elasitcsearch components
 - name: 'hashicorp/terraform:1.0.0'
-  id: ECK
+  id: Deploy Elasticsearch components
   waitFor:
-  - GKE
+  - Create new GKE
   entrypoint: 'sh'
   args: 
   - '-c'
