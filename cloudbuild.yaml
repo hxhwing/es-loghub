@@ -55,7 +55,7 @@ steps:
 
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Get ES and Kibana endpoint
-  entrypoint: /bin/bash
+  entrypoint: sh
   args:
   - '-c'
   - |
@@ -66,5 +66,27 @@ steps:
     es_endpoint="https://$es_ip:9200"
     kibana_ip=$(kubectl get svc kibana-kb-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     kibana_endpoint="https://$kibana_ip:5601"
+
+    echo "Put es_endpoint into Secret Manager"
+    gcloud secrets delete es_endpoint--quiet
+    printf $es_endpoint | gcloud secrets create es_endpoint --data-file=-
+
+    # echo $password > /workspace/es_password
+    echo "Put es_password into Secret Manager"
+    gcloud secrets delete es_password --quiet
+    printf $password | gcloud secrets create es_password --data-file=-
+
+    echo "Create one Elasticsearch API Key, and put api_key into Secret Manager"
+    api_key=$(curl --insecure -u elastic:$password -XGET ${es_endpoint}/_security/api_key?name=admin | jq .api_keys[0].id --raw-output)
+    if [ -z "$api_key" ]; then
+      api_key=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
+    else
+      curl -s --insecure -u elastic:$password -XDELETE ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}'
+      api_key=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
+    fi
+    gcloud secrets delete es_apikey --quiet
+    printf $password | gcloud secrets create es_apikey --data-file=-
+
+
     echo === "Access Kibana UI through: ${kibana_endpoint}" ===
 # [END cloudbuild-trigger-cd]
