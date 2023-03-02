@@ -53,8 +53,8 @@ steps:
       terraform apply --auto-approve
       # echo $cluster_name > /workspace/cluster_name
 
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
-  id: Get ES and Kibana endpoint
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: Get ES and Kibana endpoint and credentials
   entrypoint: /bin/bash
   args:
   - '-c'
