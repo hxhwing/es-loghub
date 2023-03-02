@@ -69,7 +69,7 @@ resource "helm_release" "elastic" {
 
 
 # Delay of 30s to wait until ECK operator is up and running
-resource "time_sleep" "30s" {
+resource "time_sleep" "sleep30s" {
   depends_on = [helm_release.elastic]
 
   create_duration = "30s"
@@ -94,7 +94,7 @@ data "kubectl_file_documents" "es" {
 resource "kubectl_manifest" "elasticsearch" {
   for_each  = data.kubectl_file_documents.es.manifests
   yaml_body = each.value
-  depends_on = [helm_release.elastic, kubectl_manifest.storageclass, time_sleep.30s]
+  depends_on = [helm_release.elastic, kubectl_manifest.storageclass, time_sleep.sleep30s]
   provisioner "local-exec" {
      command = "sleep 30"
   }
