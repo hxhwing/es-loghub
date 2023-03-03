@@ -103,6 +103,8 @@ steps:
 
     echo "===Generating terraform templates for Secret Manager==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" secret-manager/providers.tf
+    sed -i "s/REGION_ID/$region/g" secret-manager/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" secret-manager/variables.tf
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" secret-manager/main.tf
     sed -i "s/ES_PASSWORD/$es_password/g" secret-manager/main.tf
     sed -i "s/ES_APIKEY/$es_apikey/g" secret-manager/main.tf
