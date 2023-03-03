@@ -81,20 +81,38 @@ steps:
     es_apikey=$(curl -s --insecure -u elastic:$password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
     if [ -z "$es_apikey" ]; then
       # es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
-      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' |  python3 -c "import sys, json; print(json.load(sys.stdin)['decoded'])")
+      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' |  python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     else
       curl -s --insecure -u elastic:$password -XDELETE ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}'
-      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['decoded'])")
+      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     fi
     
+    echo "=== Write environment into /workspace files for next step ==="
+    echo $es_endpoint > /workspace/es_endpoint
+    echo $es_password > /workspace/es_password
+    echo $es_apikey > /workspace/es_apikey
+
+    echo "=== Access Kibana UI through: ${kibana_endpoint} ==="
+
+# Store Elasitcsearch endpoint and credentials into Secret Manager
+- name: 'hashicorp/terraform:1.0.0'
+  id: Store Elasitcsearch endpoint and credentials into Secret Manager
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+    echo "===Get variables from last step==="
+    es_endpoint=$(cat /workspace/es_endpoint)
+    es_password=$(cat /workspace/es_password)
+    es_apikey=$(cat /workspace/es_apikey)
+
+    echo "===Generating terraform templates for Secret Manager==="
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" secret-manager/main.tf
     sed -i "s/ES_PASSWORD/$es_password/g" secret-manager/main.tf
     sed -i "s/ES_APIKEY/$es_apikey/g" secret-manager/main.tf
 
-    # echo "===Save es_endpoint, es_password, es_apikey into Secret Manager==="
+    echo "===Save es_endpoint, es_password, es_apikey into Secret Manager==="
     cd secret-manager
     terraform init
     terraform apply --auto-approve
-
-    echo === "Access Kibana UI through: ${kibana_endpoint}" ===
 # [END cloudbuild-trigger-cd]
