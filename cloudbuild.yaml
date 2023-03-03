@@ -87,6 +87,8 @@ steps:
       es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     fi
     
+    echo "=== Elasticsearch API Key: ${es_apikey} ==="
+
     echo "=== Write environment into /workspace files for next step ==="
     echo $es_endpoint > /workspace/es_endpoint
     echo $es_password > /workspace/es_password
@@ -108,6 +110,8 @@ steps:
     es_apikey=$(cat /workspace/es_apikey)
 
     echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
+    echo "=== Elasticsearch password: ${es_password} ==="
+    echo "=== Elasticsearch API Key: ${es_apikey} ==="
 
     echo "===Generating terraform templates for Secret Manager==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" secret-manager/providers.tf
