@@ -101,12 +101,16 @@ steps:
   args: 
   - '-c'
   - |
+    source init.conf
     echo "===Get variables from last step==="
     es_endpoint=$(cat /workspace/es_endpoint)
     es_password=$(cat /workspace/es_password)
     es_apikey=$(cat /workspace/es_apikey)
 
+    echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
+
     echo "===Generating terraform templates for Secret Manager==="
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" secret-manager/providers.tf
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" secret-manager/main.tf
     sed -i "s/ES_PASSWORD/$es_password/g" secret-manager/main.tf
     sed -i "s/ES_APIKEY/$es_apikey/g" secret-manager/main.tf
