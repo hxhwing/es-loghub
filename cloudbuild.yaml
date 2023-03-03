@@ -101,6 +101,10 @@ steps:
     es_password=$(cat /workspace/es_password)
     es_apikey=$(cat /workspace/es_apikey)
 
+    echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
+    echo "=== Elasticsearch password: ${es_password} ==="
+    echo "=== Elasticsearch API Key: ${es_apikey} ==="
+
     echo "===Generating terraform templates for Secret Manager==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" secret-manager/providers.tf
     sed -i "s/REGION_ID/$region/g" secret-manager/variables.tf
