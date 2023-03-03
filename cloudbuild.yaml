@@ -38,6 +38,7 @@ steps:
     sed -i "s/NEW_CLUSTER_NAME/$cluster_name/g" eck/variables.tf
     sed -i "s/INSTANCE_TYPE/$instance_type/g" eck/variables.tf
     sed -i "s/INITIAL_NODE_COUNT/$node_count/g" eck/variables.tf
+    
     echo "===Generating manifest of Elasticsearch==="
     sed -i "s/NAMESPACE/$namespace/g" eck/manifests/elasticsearch.yaml
     sed -i "s/ELASTICSEARCH_VERSION/$elasticsearch_version/g" eck/manifests/elasticsearch.yaml
@@ -48,6 +49,8 @@ steps:
     sed -i "s/WARM_STORAGE_SIZE/$warm_storage_size/g" eck/manifests/elasticsearch.yaml
     sed -i "s/NAMESPACE/$namespace/g" eck/manifests/kibana.yaml
     sed -i "s/KIBANA_VERSION/$kibana_version/g" eck/manifests/kibana.yaml
+    
+    echo "===Deploy Elasticsearch stacks==="
     cd eck
     terraform init
     terraform apply --auto-approve
@@ -62,20 +65,11 @@ steps:
     source init.conf
     echo "===Get Elasticsearch access endpoint and credentials==="
     gcloud container clusters get-credentials $cluster_name --region $LOCATION
-    password=$(kubectl get secret escluster-es-elastic-user -n es -o go-template='{{.data.elastic | base64decode }}')
-    es_ip=$(kubectl get svc escluster-es-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
+    es_password=$(kubectl get secret ${cluster_name}-es-elastic-user -n es -o go-template='{{.data.elastic | base64decode }}')
+    es_ip=$(kubectl get svc ${cluster_name}-es-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     es_endpoint="https://$es_ip:9200"
     kibana_ip=$(kubectl get svc kibana-kb-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     kibana_endpoint="https://$kibana_ip:5601"
-
-    # echo "===Put es_endpoint into Secret Manager==="
-    # gcloud secrets delete es_endpoint --quiet
-    # printf $es_endpoint | gcloud secrets create es_endpoint --data-file=-
-
-    # # echo $password > /workspace/es_password
-    # echo "===Put es_password into Secret Manager==="
-    # gcloud secrets delete es_password --quiet
-    # printf $password | gcloud secrets create es_password --data-file=-
 
     echo "===Create Elasticsearch API Key==="
     es_apikey=$(curl -s --insecure -u elastic:$password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
@@ -87,8 +81,6 @@ steps:
       es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     fi
     
-    echo "=== Elasticsearch API Key: ${es_apikey} ==="
-
     echo "=== Write environment into /workspace files for next step ==="
     echo $es_endpoint > /workspace/es_endpoint
     echo $es_password > /workspace/es_password
@@ -109,17 +101,13 @@ steps:
     es_password=$(cat /workspace/es_password)
     es_apikey=$(cat /workspace/es_apikey)
 
-    echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
-    echo "=== Elasticsearch password: ${es_password} ==="
-    echo "=== Elasticsearch API Key: ${es_apikey} ==="
-
     echo "===Generating terraform templates for Secret Manager==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" secret-manager/providers.tf
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" secret-manager/main.tf
     sed -i "s/ES_PASSWORD/$es_password/g" secret-manager/main.tf
     sed -i "s/ES_APIKEY/$es_apikey/g" secret-manager/main.tf
 
-    echo "===Save es_endpoint, es_password, es_apikey into Secret Manager==="
+    echo "===Store es_endpoint, es_password, es_apikey into Secret Manager==="
     cd secret-manager
     terraform init
     terraform apply --auto-approve
