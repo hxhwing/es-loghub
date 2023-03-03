@@ -31,14 +31,14 @@ steps:
   - '-c'
   - |
       source init.conf
-      echo "Generating manifest of node pool"
+      echo "===Generating manifest of node pool==="
       sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" eck/providers.tf
       sed -i "s/REGION_ID/$region/g" eck/variables.tf
       sed -i "s/PROJECT_ID/$PROJECT_ID/g" eck/variables.tf
       sed -i "s/NEW_CLUSTER_NAME/$cluster_name/g" eck/variables.tf
       sed -i "s/INSTANCE_TYPE/$instance_type/g" eck/variables.tf
       sed -i "s/INITIAL_NODE_COUNT/$node_count/g" eck/variables.tf
-      echo "Generating manifest of Elasticsearch"
+      echo "===Generating manifest of Elasticsearch==="
       sed -i "s/NAMESPACE/$namespace/g" eck/manifests/elasticsearch.yaml
       sed -i "s/ELASTICSEARCH_VERSION/$elasticsearch_version/g" eck/manifests/elasticsearch.yaml
       sed -i "s/MASTER_NODE_COUNT/$master_node_count/g" eck/manifests/elasticsearch.yaml
@@ -53,13 +53,14 @@ steps:
       terraform apply --auto-approve
       # echo $cluster_name > /workspace/cluster_name
 
-- name: 'gcr.io/cloud-builders/gcloud'
+- name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:latest'
   id: Get ES and Kibana endpoint and credentials
   entrypoint: /bin/bash
   args:
   - '-c'
   - |
     source init.conf
+    echo "===Get Elasticsearch access endpoint and credentials==="
     gcloud container clusters get-credentials $cluster_name --region $LOCATION
     password=$(kubectl get secret escluster-es-elastic-user -n es -o go-template='{{.data.elastic | base64decode }}')
     es_ip=$(kubectl get svc escluster-es-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
@@ -67,26 +68,33 @@ steps:
     kibana_ip=$(kubectl get svc kibana-kb-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     kibana_endpoint="https://$kibana_ip:5601"
 
-    echo "===Put es_endpoint into Secret Manager==="
-    gcloud secrets delete es_endpoint --quiet
-    printf $es_endpoint | gcloud secrets create es_endpoint --data-file=-
+    # echo "===Put es_endpoint into Secret Manager==="
+    # gcloud secrets delete es_endpoint --quiet
+    # printf $es_endpoint | gcloud secrets create es_endpoint --data-file=-
 
-    # echo $password > /workspace/es_password
-    echo "===Put es_password into Secret Manager==="
-    gcloud secrets delete es_password --quiet
-    printf $password | gcloud secrets create es_password --data-file=-
+    # # echo $password > /workspace/es_password
+    # echo "===Put es_password into Secret Manager==="
+    # gcloud secrets delete es_password --quiet
+    # printf $password | gcloud secrets create es_password --data-file=-
 
-    echo "===Create one Elasticsearch API Key, and put api_key into Secret Manager==="
-    api_key=$(curl -s --insecure -u elastic:$password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
+    echo "===Create Elasticsearch API Key==="
+    es_apikey=$(curl -s --insecure -u elastic:$password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
     if [ -z "$api_key" ]; then
-      api_key=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
+      # es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
+      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' |  python3 -c "import sys, json; print(json.load(sys.stdin)['decoded'])"
     else
       curl -s --insecure -u elastic:$password -XDELETE ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}'
-      api_key=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
+      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['decoded'])"
     fi
-    gcloud secrets delete es_apikey --quiet
-    printf $password | gcloud secrets create es_apikey --data-file=-
+    
+    sed -i "s/ES_ENDPOINT/$es_endpoint/g" secret-manager/main.tf
+    sed -i "s/ES_PASSWORD/$es_password/g" secret-manager/main.tf
+    sed -i "s/ES_APIKEY/$es_apikey/g" secret-manager/main.tf
 
+    # echo "===Save es_endpoint, es_password, es_apikey into Secret Manager==="
+    cd secret-manager
+    terraform init
+    terraform apply --auto-approve
 
     echo === "Access Kibana UI through: ${kibana_endpoint}" ===
 # [END cloudbuild-trigger-cd]
