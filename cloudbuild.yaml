@@ -72,13 +72,13 @@ steps:
     kibana_endpoint="https://$kibana_ip:5601"
 
     echo "===Create Elasticsearch API Key==="
-    es_apikey=$(curl -s --insecure -u elastic:$password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
+    es_apikey=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
     if [ -z "$es_apikey" ]; then
-      # es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
-      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' |  python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
+      # es_apikey=$(curl -s --insecure -u elastic:$es_password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
+      es_apikey=$(curl -s --insecure -u elastic:$es_password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     else
-      curl -s --insecure -u elastic:$password -XDELETE ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}'
-      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
+      curl -s --insecure -u elastic:$es_password -XDELETE ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}'
+      es_apikey=$(curl -s --insecure -u elastic:$es_password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     fi
     
     echo "=== Write environment into /workspace files for next step ==="
