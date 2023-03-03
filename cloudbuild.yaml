@@ -79,12 +79,12 @@ steps:
 
     echo "===Create Elasticsearch API Key==="
     es_apikey=$(curl -s --insecure -u elastic:$password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
-    if [ -z "$api_key" ]; then
+    if [ -z "$es_apikey" ]; then
       # es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | jq --raw-output .encoded)
-      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' |  python3 -c "import sys, json; print(json.load(sys.stdin)['decoded'])"
+      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' |  python3 -c "import sys, json; print(json.load(sys.stdin)['decoded'])")
     else
       curl -s --insecure -u elastic:$password -XDELETE ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}'
-      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['decoded'])"
+      es_apikey=$(curl -s --insecure -u elastic:$password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['decoded'])")
     fi
     
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" secret-manager/main.tf
