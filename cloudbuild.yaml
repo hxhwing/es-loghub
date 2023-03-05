@@ -199,7 +199,7 @@ steps:
   - '-c'
   - |
     source stack.conf
-    if [ "$create_new_cluster" == "true" ]; then
+    if [ "$auditlog" == "true" ]; then
       echo "===Generating terraform templates for log pipeline==="
       sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/auditlog/providers.tf
       sed -i "s/REGION_ID/$region/g" pipeline/auditlog/variables.tf
