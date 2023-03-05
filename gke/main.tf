@@ -12,10 +12,8 @@ resource "google_container_cluster" "escluster" {
 
   networking_mode = "VPC_NATIVE"
 
-  monitoring_config {
-    managed_prometheus {
-      enabled = true
-    }
+  managed_prometheus {
+    enabled = true
   }
 
   workload_identity_config {
