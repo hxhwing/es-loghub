@@ -38,6 +38,7 @@ steps:
       sed -i "s/REGION_ID/$region/g" nodepool/variables.tf
       sed -i "s/PROJECT_ID/$PROJECT_ID/g" nodepool/variables.tf
       sed -i "s/CLUSTER_NAME/$cluster_name/g" nodepool/variables.tf
+
       sed -i "s/INSTANCE_TYPE/$instance_type/g" nodepool/variables.tf
       sed -i "s/INITIAL_NODE_COUNT/$node_count/g" nodepool/variables.tf
 
@@ -63,6 +64,10 @@ steps:
     source stack.conf    
     echo "===Generating manifest of Elasticsearch==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" elasticsearch/providers.tf
+    sed -i "s/REGION_ID/$region/g" elasticsearch/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" elasticsearch/variables.tf
+    sed -i "s/CLUSTER_NAME/$cluster_name/g" elasticsearch/variables.tf
+
     sed -i "s/NAMESPACE/$namespace/g" elasticsearch/main.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" elasticsearch/main.tf
     sed -i "s/NAMESPACE/$namespace/g" elasticsearch/manifests/es-sa.yaml
@@ -128,6 +133,8 @@ steps:
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" monitoring/providers.tf
     sed -i "s/REGION_ID/$region/g" monitoring/variables.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" monitoring/variables.tf
+    sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/variables.tf
+
     sed -i "s/ES_APIKEY/$es_apikey/g" monitoring/manifests/apikey.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/apikey.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/elasticsearch-exporter.yaml
@@ -160,6 +167,7 @@ steps:
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" secretmanager/providers.tf
     sed -i "s/REGION_ID/$region/g" secretmanager/variables.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" secretmanager/variables.tf
+    
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" secretmanager/main.tf
     sed -i "s/ES_PASSWORD/$es_password/g" secretmanager/main.tf
     sed -i "s/ES_APIKEY/$es_apikey/g" secretmanager/main.tf
