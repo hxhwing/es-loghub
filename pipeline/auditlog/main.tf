@@ -116,7 +116,7 @@ resource "google_logging_organization_sink" "sink" {
   org_id = var.organization
   include_children = true
 
-  destination = google_pubsub_topic.topic.id
+  destination = "pubsub.googleapis.com/${google_pubsub_topic.topic.id}"
 
   filter = "protoPayload.@type=\"type.googleapis.com/google.cloud.audit.AuditLog\""
   # exclusions {
