@@ -8,7 +8,7 @@ module "secret-manager" {
   secrets = [
     {
       name                     = var.es_endpoint_secretname
-      secret_data              = "ES_ENDPOINT"
+      secret_data              = "ES_IP"
       automatic_replication    = true
     },
     {

@@ -8,8 +8,8 @@ data "google_storage_bucket" "bucket" {
 
 data "archive_file" "source" {
   type        = "zip"
-  source_dir  = "src/"
-  output_path = "src/function-source.zip"
+  source_files = ["./src/main.py", "./src/requirements.txt"]
+  output_path = "./src/function-source.zip"
 }
 
 resource "random_id" "suffix" {
