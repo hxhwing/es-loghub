@@ -10,7 +10,7 @@ variable "project" {
 
 variable "es_endpoint_secretname" {
   type    = string
-  default = "es_endpoint"
+  default = "es_ip"
 }
 
 variable "es_password_secretname" {
