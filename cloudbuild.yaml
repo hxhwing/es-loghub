@@ -199,17 +199,23 @@ steps:
   - '-c'
   - |
     source stack.conf
+    if [ "$create_new_cluster" == "true" ]; then
+      echo "===Generating terraform templates for log pipeline==="
+      sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/auditlog/providers.tf
+      sed -i "s/REGION_ID/$region/g" pipeline/auditlog/variables.tf
+      sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/auditlog/variables.tf
+      sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/auditlog/variables.tf
+      sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/auditlog/variables.tf
+      sed -i "s/INDEX_PREFIX/$auditlog_index_prefix/g" pipeline/auditlog/src/main.py
 
-    echo "===Generating terraform templates for log pipeline==="
-    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/auditlog/providers.tf
-    sed -i "s/REGION_ID/$region/g" pipeline/auditlog/variables.tf
-    sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/auditlog/variables.tf
-    sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/auditlog/variables.tf
-    sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/auditlog/variables.tf
-    sed -i "s/INDEX_PREFIX/$auditlog_index_prefix/g" pipeline/auditlog/src/main.py
+      cd pipeline/auditlog
+      terraform init
+      terraform apply --auto-approve
 
-    cd pipeline/auditlog
-    terraform init
-    terraform apply --auto-approve
+    else
+      echo "*************** No auditlog pipeline required ******************"
+      cd pipeline/auditlog
+      terraform destroy --auto-approve
+    fi
 
 # [END cloudbuild-trigger-cd]
