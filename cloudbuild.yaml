@@ -124,7 +124,7 @@ steps:
     echo "=== Username: elastic; Password: ${es_password}   ==="
 
 # Setup Managed Prometheus for Elasticsearch monitoring
-- name: 'hashicorp/terraform:1.0.0'
+- name: 'hashicorp/terraform:latest'
   id: Setup Managed Prometheus for monitoring
   entrypoint: 'sh'
   args: 
@@ -149,9 +149,6 @@ steps:
     cd monitoring
     terraform init
     terraform apply --auto-approve
-
-    gcloud container clusters get-credentials $cluster_name --region $LOCATION
-    kubectl rollout restart deployment/elasticsearch-exporter -n $namespace
 
 # Store Elasitcsearch endpoint and credentials into Secret Manager
 - name: 'hashicorp/terraform:1.0.0'
