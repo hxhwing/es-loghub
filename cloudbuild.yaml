@@ -62,6 +62,7 @@ steps:
   - |
     source stack.conf    
     echo "===Generating manifest of Elasticsearch==="
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" elasticsearch/providers.tf
     sed -i "s/NAMESPACE/$namespace/g" elasticsearch/main.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" elasticsearch/main.tf
     sed -i "s/NAMESPACE/$namespace/g" elasticsearch/manifests/es-sa.yaml
