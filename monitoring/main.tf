@@ -16,11 +16,11 @@ resource "kubectl_manifest" "exporter" {
   for_each   = data.kubectl_file_documents.exporter.manifests
   yaml_body  = each.value
   depends_on = [kubectl_manifest.secret]
-  lifecycle {
-    replace_triggered_by = [
-      kubectl_manifest.secret.id
-    ]
-  }
+  # lifecycle {
+  #   replace_triggered_by = [
+  #     kubectl_manifest.secret.id
+  #   ]
+  # }
 }
 
 data "kubectl_file_documents" "podmonitoring" {
