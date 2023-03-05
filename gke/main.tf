@@ -10,7 +10,7 @@ resource "google_container_cluster" "escluster" {
   #   ignore_changes = [node_pool]
   # }
 
-  networking_mode = VPC_NATIVE
+  networking_mode = "VPC_NATIVE"
 
   monitoring_config {
     managed_prometheus = enabled
