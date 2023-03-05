@@ -9,4 +9,18 @@ resource "google_container_cluster" "escluster" {
   # lifecycle {
   #   ignore_changes = [node_pool]
   # }
+
+  networking_mode = VPC_NATIVE
+
+  monitoring_config {
+    managed_prometheus = enabled
+  }
+
+  workload_identity_config {
+    workload_pool = "${var.project}.svc.id.goog"
+  }
+
+  gke_backup_agent_config {
+    enabled = true
+  }
 }

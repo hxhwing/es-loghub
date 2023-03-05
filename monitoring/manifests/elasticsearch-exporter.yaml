@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-exporter
+  namespace: NAMESPACE
+  labels:
+    app.kubernetes.io/name: elasticsearch-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: elasticsearch-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: elasticsearch-exporter
+    spec:
+      containers:
+      - name: exporter
+        image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0
+        env:
+        - name: ES_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: es-apikey
+              key: apikey
+        args:
+        - '--es.uri=https://$CLUSTER_NAME-es-internal-http:9200'
+        - '--es.ssl-skip-verify'
+        ports:
+        - containerPort: 9114
+          name: prometheus
