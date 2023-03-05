@@ -31,7 +31,7 @@ data "kubectl_file_documents" "es-sa" {
 resource "kubectl_manifest" "es-sa" {
   for_each   = data.kubectl_file_documents.es-sa.manifests
   yaml_body  = each.value
-  depends_on = [google_service_account_iam_binding.sa-user]
+  depends_on = [google_service_account_iam_binding.sa-user, kubectl_manifest.elasticsearch]
 }
 
 

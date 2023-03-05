@@ -70,14 +70,18 @@ steps:
 
     sed -i "s/NAMESPACE/$namespace/g" elasticsearch/main.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" elasticsearch/main.tf
+
     sed -i "s/NAMESPACE/$namespace/g" elasticsearch/manifests/es-sa.yaml
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" elasticsearch/manifests/es-sa.yaml
+
+    sed -i "s/NAMESPACE/$namespace/g" elasticsearch/manifests/elasticsearch.yaml
     sed -i "s/ELASTICSEARCH_VERSION/$elasticsearch_version/g" elasticsearch/manifests/elasticsearch.yaml
     sed -i "s/MASTER_NODE_COUNT/$master_node_count/g" elasticsearch/manifests/elasticsearch.yaml
     sed -i "s/HOT_NODE_COUNT/$hot_node_count/g" elasticsearch/manifests/elasticsearch.yaml
     sed -i "s/HOT_STORAGE_SIZE/$hot_storage_size/g" elasticsearch/manifests/elasticsearch.yaml
     sed -i "s/WARM_NODE_COUNT/$warm_node_count/g" elasticsearch/manifests/elasticsearch.yaml
     sed -i "s/WARM_STORAGE_SIZE/$warm_storage_size/g" elasticsearch/manifests/elasticsearch.yaml
+
     sed -i "s/NAMESPACE/$namespace/g" elasticsearch/manifests/kibana.yaml
     sed -i "s/KIBANA_VERSION/$kibana_version/g" elasticsearch/manifests/kibana.yaml
     
@@ -167,7 +171,7 @@ steps:
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" secretmanager/providers.tf
     sed -i "s/REGION_ID/$region/g" secretmanager/variables.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" secretmanager/variables.tf
-    
+
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" secretmanager/main.tf
     sed -i "s/ES_PASSWORD/$es_password/g" secretmanager/main.tf
     sed -i "s/ES_APIKEY/$es_apikey/g" secretmanager/main.tf
