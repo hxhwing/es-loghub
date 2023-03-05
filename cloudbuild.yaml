@@ -101,7 +101,7 @@ steps:
     gcloud container clusters get-credentials $cluster_name --region $LOCATION
     es_password=$(kubectl get secret ${cluster_name}-es-elastic-user -n es -o go-template='{{.data.elastic | base64decode }}')
     es_ip=$(kubectl get svc ${cluster_name}-es-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
-    es_endpoint="https://$es_ip:9200"
+    es_endpoint="https://${es_ip}:9200"
 
     kibana_ip=$(kubectl get svc kibana-kb-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     kibana_endpoint="https://$kibana_ip:5601"
@@ -116,6 +116,7 @@ steps:
     fi
     
     echo "=== Write environment into /workspace files for following steps ==="
+    echo "es_endpoint: ${es_endpoint}"
     echo $es_endpoint > /workspace/es_endpoint
     echo $es_password > /workspace/es_password
     echo $es_apikey > /workspace/es_apikey
@@ -160,6 +161,9 @@ steps:
     gcloud container clusters get-credentials $cluster_name --region $LOCATION
     kubectl rollout restart deployment elasticsearch-exporter -n $namespace
 
+    es_endpoint=$(cat /workspace/es_endpoint)
+    echo "es_endpoint: ${es_endpoint}"
+
 # Store Elasitcsearch endpoint and credentials into Secret Manager
 - name: 'hashicorp/terraform:1.0.0'
   id: Store Elasitcsearch endpoint and credentials into Secret Manager
@@ -173,9 +177,9 @@ steps:
     es_password=$(cat /workspace/es_password)
     es_apikey=$(cat /workspace/es_apikey)
 
-    # echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
-    # echo "=== Elasticsearch password: ${es_password} ==="
-    # echo "=== Elasticsearch API Key: ${es_apikey} ==="
+    echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
+    echo "=== Elasticsearch password: ${es_password} ==="
+    echo "=== Elasticsearch API Key: ${es_apikey} ==="
 
     echo "===Generating terraform templates for Secret Manager==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" secretmanager/providers.tf
