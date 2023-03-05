@@ -16,6 +16,7 @@ resource "google_container_cluster" "escluster" {
     enable_components = ["SYSTEM_COMPONENTS"]
     managed_prometheus {
       enabled = true
+    }
   }
 
   workload_identity_config {
