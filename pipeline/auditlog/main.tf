@@ -8,8 +8,8 @@ data "google_storage_bucket" "bucket" {
 
 data "archive_file" "source" {
   type        = "zip"
-  source_files = ["./src/main.py", "./src/requirements.txt"]
-  output_path = "./src/function-source.zip"
+  source_dir  = "./src/"
+  output_path = "/tmp/function-auditlog.zip"
 }
 
 resource "random_id" "suffix" {
@@ -46,14 +46,14 @@ resource "google_pubsub_topic" "err-topic" {
 }
 
 resource "google_storage_bucket_object" "object" {
-  name   = "pipeline/auditlog/function-source.zip"
+  name   = "function-auditlog.zip"
   bucket = data.google_storage_bucket.bucket.name
-  source = data.archive_file.source # Add path to the zipped function source code
+  source = data.archive_file.source.output_path # Add path to the zipped function source code
 }
 
 
-data "google_secret_manager_secret" "es_endpoint" {
-  secret_id = "es_endpoint"
+data "google_secret_manager_secret" "es_ip" {
+  secret_id = "es_ip"
 }
 
 data "google_secret_manager_secret" "es_apikey" {
@@ -68,9 +68,6 @@ resource "google_cloudfunctions2_function" "function" {
   build_config {
     runtime     = "python311"
     entry_point = "pubsub_to_es" # Set the entry point
-    # environment_variables = {
-    #   BUILD_CONFIG_TEST = "build_test"
-    # }
     source {
       storage_source {
         bucket = data.google_storage_bucket.bucket.name
@@ -88,33 +85,22 @@ resource "google_cloudfunctions2_function" "function" {
     available_cpu                    = "1"
     environment_variables = {
       "error_topic" = google_pubsub_topic.err-topic.id
-      # "es_endpoint" = "https://34.30.71.18:9200"
     }
     ingress_settings               = "ALLOW_INTERNAL_ONLY"
     all_traffic_on_latest_revision = true
     service_account_email          = google_service_account.sa.email
-  #   secret_environment_variables {
-  #     key        = "es_apikey"
-  #     project_id = var.project
-  #     secret     = data.google_secret_manager_secret.es_apikey.secret_id
-  #     version    = "latest"
-  #   }
-  # }
-
-    secret_environment_variables = [
-      {
-        key        = "es_endpoint"
-        project_id = var.project
-        secret     = data.google_secret_manager_secret.es_endpoint.secret_id
-        version    = "latest"
-      },
-      {
-        key        = "es_apikey"
-        project_id = var.project
-        secret     = data.google_secret_manager_secret.es_apikey.secret_id
-        version    = "latest"
-      }
-    ]
+    secret_environment_variables {
+      key        = "es_apikey"
+      project_id = var.project
+      secret     = data.google_secret_manager_secret.es_apikey.secret_id
+      version    = "latest"
+    }
+    secret_environment_variables {
+      key        = "es_ip"
+      project_id = var.project
+      secret     = data.google_secret_manager_secret.es_ip.secret_id
+      version    = "latest"
+    }
   }
 
   event_trigger {

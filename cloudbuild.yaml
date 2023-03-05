@@ -191,4 +191,24 @@ steps:
     terraform init
     terraform apply --auto-approve
 
+# Create log pipeline for auditlog
+- name: 'hashicorp/terraform:1.0.0'
+  id: Create log pipeline for auditlog
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+    source stack.conf
+
+    echo "===Generating terraform templates for Secret Manager==="
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/auditlog/providers.tf
+    sed -i "s/REGION_ID/$region/g" pipeline/auditlog/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/auditlog/variables.tf
+    sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/auditlog/variables.tf
+    sed -i "s/INDEX_PREFIX/$auditlog_index_prefix/g" pipeline/auditlog/src/main.py
+
+    cd pipeline/auditlog
+    terraform init
+    terraform apply --auto-approve
+
 # [END cloudbuild-trigger-cd]

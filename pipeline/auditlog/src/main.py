@@ -6,22 +6,22 @@ import urllib3
 import functions_framework
 from concurrent import futures
 from google.cloud import pubsub_v1
-from typing import Callable
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 function_name = os.environ.get("FUNCTION_NAME")
 today = date.today()
-index_prefix = function_name
+index_prefix = "INDEX_PREFIX"
 index = index_prefix + "-" + str(today)
 
-es_host = os.environ.get("es_endpoint")
+es_ip = os.environ.get("es_ip")
+es_endpoint = "https://" + es_ip + ":9200"
 api_key = os.environ.get("es_apikey")
 error_topic = os.environ.get("error_topic")
 
 es = Elasticsearch(
-    [es_host],
+    [es_endpoint],
     # basic_auth=(username, password),
     api_key=api_key,
     ssl_show_warn=False,
