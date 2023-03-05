@@ -13,14 +13,18 @@ resource "google_container_cluster" "escluster" {
   networking_mode = "VPC_NATIVE"
 
   monitoring_config {
-    managed_prometheus = "enabled"
+    managed_prometheus {
+      enabled = true
+    }
   }
 
   workload_identity_config {
     workload_pool = "${var.project}.svc.id.goog"
   }
 
-  gke_backup_agent_config {
-    enabled = true
+  addons_config {
+    gke_backup_agent_config {
+      enabled = true
+    }
   }
 }
