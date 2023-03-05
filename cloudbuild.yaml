@@ -150,6 +150,9 @@ steps:
     terraform init
     terraform apply --auto-approve
 
+    gcloud container clusters get-credentials $cluster_name --region $LOCATION
+    kubectl rollout restart deployment/elasticsearch-exporter -n $namespace
+
 # Store Elasitcsearch endpoint and credentials into Secret Manager
 - name: 'hashicorp/terraform:1.0.0'
   id: Store Elasitcsearch endpoint and credentials into Secret Manager
