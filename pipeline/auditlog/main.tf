@@ -13,7 +13,7 @@ data "archive_file" "source" {
 }
 
 resource "random_id" "suffix" {
-  byte_length = 4
+  byte_length = 2
 }
 
 resource "google_service_account" "sa" {
@@ -29,7 +29,6 @@ resource "google_project_iam_member" "sa-role" {
     "roles/cloudfunctions.invoker",
     "roles/run.invoker",
     "roles/storage.admin",
-    "roles/viewer",
   ])
   role    = each.key
   member  = "serviceAccount:${google_service_account.sa.email}"
@@ -109,4 +108,19 @@ resource "google_cloudfunctions2_function" "function" {
     pubsub_topic   = google_pubsub_topic.topic.id
     retry_policy   = "RETRY_POLICY_RETRY"
   }
+}
+
+
+resource "google_logging_organization_sink" "sink" {
+  name   = "auditlog-sink"
+  org_id = var.organization
+  include_children = true
+
+  destination = google_pubsub_topic.topic.id
+
+  filter = "protoPayload.@type="type.googleapis.com/google.cloud.audit.AuditLog""
+  # exclusions {
+  #   name = ""
+  #   filter = ""
+  # }
 }

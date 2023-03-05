@@ -12,3 +12,8 @@ variable "bucket_name" {
   type = string
   default = "BUCKET_NAME"
 }
+
+variable "organization" {
+  type = string
+  default = "ORGANIZATION_ID"
+}

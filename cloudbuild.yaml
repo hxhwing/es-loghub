@@ -200,11 +200,12 @@ steps:
   - |
     source stack.conf
 
-    echo "===Generating terraform templates for Secret Manager==="
+    echo "===Generating terraform templates for log pipeline==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/auditlog/providers.tf
     sed -i "s/REGION_ID/$region/g" pipeline/auditlog/variables.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/auditlog/variables.tf
     sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/auditlog/variables.tf
+    sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/auditlog/variables.tf
     sed -i "s/INDEX_PREFIX/$auditlog_index_prefix/g" pipeline/auditlog/src/main.py
 
     cd pipeline/auditlog
