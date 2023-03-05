@@ -24,7 +24,7 @@ spec:
               name: es-apikey
               key: apikey
         args:
-        - '--es.uri=https://$CLUSTER_NAME-es-internal-http:9200'
+        - '--es.uri=https://CLUSTER_NAME-es-internal-http:9200'
         - '--es.ssl-skip-verify'
         ports:
         - containerPort: 9114

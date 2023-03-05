@@ -4,7 +4,7 @@ data "kubectl_file_documents" "secret" {
 }
 
 resource "kubectl_manifest" "secret" {
-  for_each   = data.kubectl_file_documents.exporter.manifests
+  for_each   = data.kubectl_file_documents.secret.manifests
   yaml_body  = each.value
 }
 

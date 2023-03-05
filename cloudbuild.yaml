@@ -139,11 +139,11 @@ steps:
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" monitoring/variables.tf
     sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/variables.tf
 
-    sed -i "s/ES_APIKEY/$es_apikey/g" monitoring/manifests/apikey.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/apikey.yaml
+    sed -i "s/ES_APIKEY/$es_apikey/g" monitoring/manifests/apikey.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/elasticsearch-exporter.yaml
-    sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/podmonitoring.yaml
     sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/manifests/elasticsearch-exporter.yaml
+    sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/podmonitoring.yaml
 
     echo "=== Install elasticsearch-exporter and PodMonitoring ==="
     cd monitoring
