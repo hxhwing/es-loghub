@@ -13,7 +13,7 @@ resource "google_container_cluster" "escluster" {
   networking_mode = "VPC_NATIVE"
 
   monitoring_config {
-    enable_components: ["SYSTEM_COMPONENTS"]
+    enable_components = ["SYSTEM_COMPONENTS"]
     managed_prometheus {
       enabled = true
   }
