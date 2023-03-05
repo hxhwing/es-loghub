@@ -23,7 +23,7 @@ variable "instance_type" {
 variable "nodepool_name" {
   type        = string
   description = "node pool name for Elasticsearch"
-  default     = "es_nodepool"
+  default     = "es-nodepool"
 }
 
 variable "node_count" {
