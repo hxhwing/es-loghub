@@ -112,7 +112,7 @@ resource "google_cloudfunctions2_function" "function" {
 
 
 resource "google_logging_organization_sink" "sink" {
-  name   = "auditlog-sink"
+  name   = "auditlog-sink-${random_id.suffix.hex}"
   org_id = var.organization
   include_children = true
 

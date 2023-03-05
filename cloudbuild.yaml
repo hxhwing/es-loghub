@@ -161,7 +161,7 @@ steps:
     kubectl rollout restart deployment elasticsearch-exporter -n $namespace
 
 # Store Elasitcsearch endpoint and credentials into Secret Manager
-- name: 'hashicorp/terraform:1.0.0'
+- name: 'hashicorp/terraform:latest'
   id: Store Elasitcsearch endpoint and credentials into Secret Manager
   entrypoint: 'sh'
   args: 
@@ -192,7 +192,7 @@ steps:
     terraform apply --auto-approve
 
 # Create log pipeline for auditlog
-- name: 'hashicorp/terraform:1.0.0'
+- name: 'hashicorp/terraform:latest'
   id: Create log pipeline for auditlog
   entrypoint: 'sh'
   args: 
