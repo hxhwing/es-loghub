@@ -2,7 +2,7 @@
 # [START cloudbuild]
 steps:
 # Create new GKE clsuter
-- name: 'hashicorp/terraform:1.0.0'
+- name: 'hashicorp/terraform:latest'
   id: Create new GKE cluster
   entrypoint: 'sh'
   args: 
@@ -23,7 +23,7 @@ steps:
     fi
 
 # Create new node pool for Elasticsearch
-- name: 'hashicorp/terraform:1.0.0'
+- name: 'hashicorp/terraform:latest'
   id: Create new nodepool
   waitFor:
   - Create new GKE cluster
@@ -53,7 +53,7 @@ steps:
 
 
 # Deploy Elasitcsearch components
-- name: 'hashicorp/terraform:1.0.0'
+- name: 'hashicorp/terraform:latest'
   id: Deploy Elasticsearch components
   waitFor:
   - Create new nodepool
@@ -149,6 +149,16 @@ steps:
     cd monitoring
     terraform init
     terraform apply --auto-approve
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: Update API key in elasticsearch-exporter
+  entrypoint: /bin/bash
+  args:
+  - '-c'
+  - |
+    source stack.conf
+    gcloud container clusters get-credentials $cluster_name --region $LOCATION
+    kubectl rollout deployment elasticsearch-exporter -n $namespace
 
 # Store Elasitcsearch endpoint and credentials into Secret Manager
 - name: 'hashicorp/terraform:1.0.0'
