@@ -77,7 +77,7 @@ resource "google_cloudfunctions2_function" "function" {
 
   service_config {
     max_instance_count               = 5
-    min_instance_count               = 1
+    min_instance_count               = 0
     available_memory                 = "256M"
     timeout_seconds                  = 60
     max_instance_request_concurrency = 80
@@ -85,7 +85,7 @@ resource "google_cloudfunctions2_function" "function" {
     environment_variables = {
       "error_topic" = google_pubsub_topic.err-topic.id
     }
-    ingress_settings               = "ALLOW_INTERNAL_ONLY"
+    ingress_settings               = "ALLOW_ALL"
     all_traffic_on_latest_revision = true
     service_account_email          = google_service_account.sa.email
     secret_environment_variables {
@@ -108,6 +108,8 @@ resource "google_cloudfunctions2_function" "function" {
     pubsub_topic   = google_pubsub_topic.topic.id
     retry_policy   = "RETRY_POLICY_RETRY"
   }
+
+  depends_on = [google_project_iam_member.sa-role]
 }
 
 
