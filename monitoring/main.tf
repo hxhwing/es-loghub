@@ -24,7 +24,7 @@ resource "kubectl_manifest" "exporter" {
 }
 
 data "kubectl_file_documents" "podmonitoring" {
-  content = file("manifests/elasticsearch-exporter.yaml")
+  content = file("manifests/podmonitoring.yaml")
 }
 
 resource "kubectl_manifest" "podmonitoring" {
