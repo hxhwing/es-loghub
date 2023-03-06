@@ -1,7 +1,7 @@
 terraform {
   backend "gcs" {
     bucket = "BACKEND_BUCKET_NAME"
-    prefix = "terraform/state/pipeline/dnslog"
+    prefix = "terraform/state/pipeline/waflog"
   }
   required_providers {
     google = {
