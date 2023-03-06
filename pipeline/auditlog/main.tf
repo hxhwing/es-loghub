@@ -126,3 +126,9 @@ resource "google_logging_organization_sink" "sink" {
   #   filter = ""
   # }
 }
+
+resource "google_project_iam_member" "log-writer" {
+  project = var.project
+  role    = "roles/pubsub.publisher"
+  member  = google_logging_organization_sink.sink.writer_identity
+}
