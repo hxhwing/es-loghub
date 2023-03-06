@@ -125,7 +125,7 @@ steps:
 
 # Setup Managed Prometheus for Elasticsearch monitoring
 - name: 'hashicorp/terraform:latest'
-  id: Setup Managed Prometheus for monitoring
+  id: Managed Prometheus for monitoring
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -194,7 +194,7 @@ steps:
 
 # Create log pipeline for auditlog
 - name: 'hashicorp/terraform:latest'
-  id: Create log pipeline for auditlog
+  id: Manage log pipeline for auditlog
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -222,7 +222,7 @@ steps:
 
 # Create log pipeline for dnslog
 - name: 'hashicorp/terraform:latest'
-  id: Create log pipeline for dnslog
+  id: Manage log pipeline for dnslog
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -244,6 +244,34 @@ steps:
     else
       echo "*************** No dnslog pipeline required ******************"
       cd pipeline/dnslog
+      terraform init
+      terraform destroy --auto-approve
+    fi
+
+# Create log pipeline for waflog
+- name: 'hashicorp/terraform:latest'
+  id: Manage log pipeline for waflog
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+    source stack.conf
+    echo "===Generating terraform templates for log pipeline==="
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/waflog/providers.tf
+    sed -i "s/REGION_ID/$region/g" pipeline/waflog/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/waflog/variables.tf
+    sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/waflog/variables.tf
+    sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/waflog/variables.tf
+    sed -i "s/INDEX_PREFIX/$waflog_index_prefix/g" pipeline/waflog/src/main.py
+
+    if [ "$dnslog" == "true" ]; then
+      cd pipeline/waflog
+      terraform init
+      terraform apply --auto-approve
+
+    else
+      echo "*************** No waflog pipeline required ******************"
+      cd pipeline/waflog
       terraform init
       terraform destroy --auto-approve
     fi
