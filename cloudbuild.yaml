@@ -9,12 +9,12 @@ steps:
   - '-c'
   - |
     source stack.conf
-    if [ "$create_new_cluster" == "true" ]; then
-      sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" gke/providers.tf
-      sed -i "s/REGION_ID/$region/g" gke/variables.tf
-      sed -i "s/PROJECT_ID/$PROJECT_ID/g" gke/variables.tf
-      sed -i "s/CLUSTER_NAME/$cluster_name/g" gke/variables.tf
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" gke/providers.tf
+    sed -i "s/REGION_ID/$region/g" gke/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" gke/variables.tf
+    sed -i "s/CLUSTER_NAME/$cluster_name/g" gke/variables.tf
 
+    if [ "$create_new_cluster" == "true" ]; then
       cd gke
       terraform init
       terraform apply --auto-approve
@@ -32,16 +32,16 @@ steps:
   - '-c'
   - |
     source stack.conf
+    echo "===Generating manifest of node pool==="
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" nodepool/providers.tf
+    sed -i "s/REGION_ID/$region/g" nodepool/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" nodepool/variables.tf
+    sed -i "s/CLUSTER_NAME/$cluster_name/g" nodepool/variables.tf
+
+    sed -i "s/INSTANCE_TYPE/$instance_type/g" nodepool/variables.tf
+    sed -i "s/INITIAL_NODE_COUNT/$node_count/g" nodepool/variables.tf
+
     if [ "$create_new_nodepool" == "true" ]; then
-      echo "===Generating manifest of node pool==="
-      sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" nodepool/providers.tf
-      sed -i "s/REGION_ID/$region/g" nodepool/variables.tf
-      sed -i "s/PROJECT_ID/$PROJECT_ID/g" nodepool/variables.tf
-      sed -i "s/CLUSTER_NAME/$cluster_name/g" nodepool/variables.tf
-
-      sed -i "s/INSTANCE_TYPE/$instance_type/g" nodepool/variables.tf
-      sed -i "s/INITIAL_NODE_COUNT/$node_count/g" nodepool/variables.tf
-
       echo "===Create new node pool==="
       cd nodepool
       terraform init
@@ -199,15 +199,15 @@ steps:
   - '-c'
   - |
     source stack.conf
-    if [ "$auditlog" == "true" ]; then
-      echo "===Generating terraform templates for log pipeline==="
-      sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/auditlog/providers.tf
-      sed -i "s/REGION_ID/$region/g" pipeline/auditlog/variables.tf
-      sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/auditlog/variables.tf
-      sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/auditlog/variables.tf
-      sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/auditlog/variables.tf
-      sed -i "s/INDEX_PREFIX/$auditlog_index_prefix/g" pipeline/auditlog/src/main.py
+    echo "===Generating terraform templates for log pipeline==="
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/auditlog/providers.tf
+    sed -i "s/REGION_ID/$region/g" pipeline/auditlog/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/auditlog/variables.tf
+    sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/auditlog/variables.tf
+    sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/auditlog/variables.tf
+    sed -i "s/INDEX_PREFIX/$auditlog_index_prefix/g" pipeline/auditlog/src/main.py
 
+    if [ "$auditlog" == "true" ]; then
       cd pipeline/auditlog
       terraform init
       terraform apply --auto-approve
