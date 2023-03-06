@@ -74,7 +74,7 @@ resource "kubectl_manifest" "elasticsearch" {
   yaml_body  = each.value
   depends_on = [helm_release.elastic, kubectl_manifest.storageclass, time_sleep.sleep10s]
   provisioner "local-exec" {
-    command = "sleep 10"
+    command = "sleep 30"
   }
 }
 
@@ -88,7 +88,7 @@ resource "kubectl_manifest" "kibana" {
   yaml_body  = each.value
   depends_on = [helm_release.elastic, kubectl_manifest.elasticsearch]
   provisioner "local-exec" {
-    command = "sleep 10"
+    command = "sleep 30"
   }
 }
 

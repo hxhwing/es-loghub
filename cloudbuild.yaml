@@ -215,6 +215,35 @@ steps:
     else
       echo "*************** No auditlog pipeline required ******************"
       cd pipeline/auditlog
+      terraform init
+      terraform destroy --auto-approve
+    fi
+
+# Create log pipeline for dnslog
+- name: 'hashicorp/terraform:latest'
+  id: Create log pipeline for dnslog
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+    source stack.conf
+    echo "===Generating terraform templates for log pipeline==="
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/dnslog/providers.tf
+    sed -i "s/REGION_ID/$region/g" pipeline/dnslog/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/dnslog/variables.tf
+    sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/dnslog/variables.tf
+    sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/dnslog/variables.tf
+    sed -i "s/INDEX_PREFIX/$dnslog_index_prefix/g" pipeline/dnslog/src/main.py
+
+    if [ "$dnslog" == "true" ]; then
+      cd pipeline/dnslog
+      terraform init
+      terraform apply --auto-approve
+
+    else
+      echo "*************** No dnslog pipeline required ******************"
+      cd pipeline/dnslog
+      terraform init
       terraform destroy --auto-approve
     fi
 
