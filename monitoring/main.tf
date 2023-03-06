@@ -6,6 +6,9 @@ data "kubectl_file_documents" "secret" {
 resource "kubectl_manifest" "secret" {
   for_each   = data.kubectl_file_documents.secret.manifests
   yaml_body  = each.value
+  provisioner "local-exec" {
+    command = "sleep 10"
+  }
 }
 
 data "kubectl_file_documents" "exporter" {
