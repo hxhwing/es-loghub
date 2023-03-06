@@ -264,7 +264,7 @@ steps:
     sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/waflog/variables.tf
     sed -i "s/INDEX_PREFIX/$waflog_index_prefix/g" pipeline/waflog/src/main.py
 
-    if [ "$dnslog" == "true" ]; then
+    if [ "$waflog" == "true" ]; then
       cd pipeline/waflog
       terraform init
       terraform apply --auto-approve
