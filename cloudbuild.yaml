@@ -248,30 +248,30 @@ steps:
       terraform destroy --auto-approve
     fi
 
-# Create log pipeline for waflog
+# Create log pipeline for httplog
 - name: 'hashicorp/terraform:latest'
-  id: Manage log pipeline for waflog
+  id: Manage log pipeline for httplog
   entrypoint: 'sh'
   args: 
   - '-c'
   - |
     source deployment.conf
     echo "===Generating terraform templates for log pipeline==="
-    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/waflog/providers.tf
-    sed -i "s/REGION_ID/$region/g" pipeline/waflog/variables.tf
-    sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/waflog/variables.tf
-    sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/waflog/variables.tf
-    sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/waflog/variables.tf
-    sed -i "s/INDEX_PREFIX/$waflog_index_prefix/g" pipeline/waflog/src/main.py
+    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/httplog/providers.tf
+    sed -i "s/REGION_ID/$region/g" pipeline/httplog/variables.tf
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/httplog/variables.tf
+    sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/httplog/variables.tf
+    sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/httplog/variables.tf
+    sed -i "s/INDEX_PREFIX/$waflog_index_prefix/g" pipeline/httplog/src/main.py
 
-    if [ "$waflog" == "true" ]; then
-      cd pipeline/waflog
+    if [ "$httplog" == "true" ]; then
+      cd pipeline/httplog
       terraform init
       terraform apply --auto-approve
 
     else
-      echo "*************** No waflog pipeline required ******************"
-      cd pipeline/waflog
+      echo "*************** No httplog pipeline required ******************"
+      cd pipeline/httplog
       terraform init
       terraform destroy --auto-approve
     fi

@@ -7,7 +7,7 @@ data "google_storage_bucket" "bucket" {
 data "archive_file" "source" {
   type        = "zip"
   source_dir  = "./src/"
-  output_path = "/tmp/function-waflog.zip"
+  output_path = "/tmp/function-httplog.zip"
 }
 
 resource "random_id" "suffix" {
@@ -15,7 +15,7 @@ resource "random_id" "suffix" {
 }
 
 resource "google_service_account" "sa" {
-  account_id = "waflog-gcf-sa"
+  account_id = "httplog-gcf-sa"
 }
 
 
@@ -35,15 +35,15 @@ resource "google_project_iam_member" "sa-role" {
 
 
 resource "google_pubsub_topic" "topic" {
-  name = "waflog-topic-${random_id.suffix.hex}"
+  name = "httplog-topic-${random_id.suffix.hex}"
 }
 
 resource "google_pubsub_topic" "err-topic" {
-  name = "waflog-err-topic-${random_id.suffix.hex}"
+  name = "httplog-err-topic-${random_id.suffix.hex}"
 }
 
 resource "google_storage_bucket_object" "object" {
-  name   = "function-waflog.zip"
+  name   = "function-httplog.zip"
   bucket = data.google_storage_bucket.bucket.name
   source = data.archive_file.source.output_path # Add path to the zipped function source code
 }
@@ -58,7 +58,7 @@ data "google_secret_manager_secret" "es_apikey" {
 }
 
 resource "google_cloudfunctions2_function" "function" {
-  name        = "waflog-function-${random_id.suffix.hex}"
+  name        = "httplog-function-${random_id.suffix.hex}"
   location    = var.region
   description = "Function for ingest log to Elasticsearch"
 
@@ -112,7 +112,7 @@ resource "google_cloudfunctions2_function" "function" {
 
 
 resource "google_logging_organization_sink" "sink" {
-  name   = "waflog-sink-${random_id.suffix.hex}"
+  name   = "httplog-sink-${random_id.suffix.hex}"
   org_id = var.organization
   include_children = true
 
