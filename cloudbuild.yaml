@@ -8,7 +8,7 @@ steps:
   args: 
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" gke/providers.tf
     sed -i "s/REGION_ID/$region/g" gke/variables.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" gke/variables.tf
@@ -31,7 +31,7 @@ steps:
   args: 
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     echo "===Generating manifest of node pool==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" nodepool/providers.tf
     sed -i "s/REGION_ID/$region/g" nodepool/variables.tf
@@ -61,7 +61,7 @@ steps:
   args: 
   - '-c'
   - |
-    source stack.conf    
+    source deployment.conf    
     echo "===Generating manifest of Elasticsearch==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" elasticsearch/providers.tf
     sed -i "s/REGION_ID/$region/g" elasticsearch/variables.tf
@@ -96,7 +96,7 @@ steps:
   args:
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     echo "===Get Elasticsearch access endpoint and credentials==="
     gcloud container clusters get-credentials $cluster_name --region $LOCATION
     es_password=$(kubectl get secret ${cluster_name}-es-elastic-user -n es -o go-template='{{.data.elastic | base64decode }}')
@@ -130,7 +130,7 @@ steps:
   args: 
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     es_apikey=$(cat /workspace/es_apikey)
 
     echo "===Generating manifest of elasticsearch-exporter==="
@@ -156,7 +156,7 @@ steps:
   args:
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     gcloud container clusters get-credentials $cluster_name --region $LOCATION
     sleep 10s
     kubectl rollout restart deployment elasticsearch-exporter -n $namespace
@@ -168,7 +168,7 @@ steps:
   args: 
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     echo "===Get variables from previous step==="
     es_ip=$(cat /workspace/es_ip)
     es_password=$(cat /workspace/es_password)
@@ -199,7 +199,7 @@ steps:
   args: 
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     echo "===Generating terraform templates for log pipeline==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/auditlog/providers.tf
     sed -i "s/REGION_ID/$region/g" pipeline/auditlog/variables.tf
@@ -227,7 +227,7 @@ steps:
   args: 
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     echo "===Generating terraform templates for log pipeline==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/dnslog/providers.tf
     sed -i "s/REGION_ID/$region/g" pipeline/dnslog/variables.tf
@@ -255,7 +255,7 @@ steps:
   args: 
   - '-c'
   - |
-    source stack.conf
+    source deployment.conf
     echo "===Generating terraform templates for log pipeline==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" pipeline/waflog/providers.tf
     sed -i "s/REGION_ID/$region/g" pipeline/waflog/variables.tf
