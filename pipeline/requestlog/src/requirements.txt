@@ -1,0 +1,3 @@
+elasticsearch
+google-cloud-pubsub
+geoip2
