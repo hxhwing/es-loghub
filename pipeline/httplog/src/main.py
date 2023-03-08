@@ -37,10 +37,10 @@ publisher = pubsub_v1.PublisherClient()
 @functions_framework.cloud_event
 def pubsub_to_es(cloud_event):
     data = base64.b64decode(cloud_event.data["message"]["data"]).decode()
-    print(type(data))
     doc = json.loads(data)
     ip = doc["httpRequest"]["remoteIp"]
-    doc.update(get_geoip(ip))
+    doc.update(get_geoip(ip))  # add geoip info into document
+    doc = json.dumps(doc)
     try:
         # write to elasicsearch
         resp = es.index(index=index, document=doc)

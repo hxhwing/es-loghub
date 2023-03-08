@@ -262,7 +262,7 @@ steps:
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" pipeline/httplog/variables.tf
     sed -i "s/BUCKET_NAME/$bucket_name/g" pipeline/httplog/variables.tf
     sed -i "s/ORGANIZATION_ID/$organization_id/g" pipeline/httplog/variables.tf
-    sed -i "s/INDEX_PREFIX/$waflog_index_prefix/g" pipeline/httplog/src/main.py
+    sed -i "s/INDEX_PREFIX/$httplog_index_prefix/g" pipeline/httplog/src/main.py
 
     if [ "$httplog" == "true" ]; then
       cd pipeline/httplog
