@@ -25,8 +25,8 @@ resource "google_project_iam_member" "sa-role" {
     "roles/pubsub.publisher",
     "roles/secretmanager.secretAccessor",
     "roles/cloudfunctions.invoker",
-    "roles/run.invoker",
-    # "roles/storage.admin",
+    "roles/storage.admin",
+    "roles/run.invoker"
   ])
   role    = each.key
   member  = "serviceAccount:${google_service_account.sa.email}"
@@ -129,4 +129,17 @@ resource "google_project_iam_member" "log-writer" {
   project = var.project
   role    = "roles/pubsub.publisher"
   member  = google_logging_organization_sink.sink.writer_identity
+}
+
+
+output "httplog-sink" {
+  value = google_logging_organization_sink.sink.id
+}
+
+output "httplog-topic" {
+  value = google_pubsub_topic.topic.id
+}
+
+output "httplog-function" {
+  value = google_cloudfunctions2_function.function.id
 }
