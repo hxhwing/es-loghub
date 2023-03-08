@@ -25,7 +25,7 @@ resource "elasticstack_elasticsearch_index_template" "template" {
   name = "httplog"
 
   # priority       = 42
-  index_patterns = ["INDEX_PREFIX*"]
+  index_patterns = ["INDEX_PREFIX*", "log-*"]
 
   template {
     # alias {
