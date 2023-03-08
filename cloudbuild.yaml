@@ -111,7 +111,7 @@ steps:
     sed -i "s/INDEX_PREFIX/$httplog_index_prefix/g" esconfig/main.tf
 
     echo "===Creating API key, monitor user, and index template==="
-    cd monitoring
+    cd esconfig
     terraform init
     terraform apply --auto-approve
     es_apikey=$(terraform output -raw api_key)
