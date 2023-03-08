@@ -7,6 +7,7 @@ import functions_framework
 from concurrent import futures
 from google.cloud import pubsub_v1
 from geoip import get_geoip
+import json
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -35,7 +36,9 @@ publisher = pubsub_v1.PublisherClient()
 
 @functions_framework.cloud_event
 def pubsub_to_es(cloud_event):
-    doc = base64.b64decode(cloud_event.data["message"]["data"]).decode()
+    data = base64.b64decode(cloud_event.data["message"]["data"]).decode()
+    print(type(data))
+    doc = json.loads(data)
     ip = doc["httpRequest"]["remoteIp"]
     doc.update(get_geoip(ip))
     try:
