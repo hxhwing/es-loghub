@@ -1,0 +1,29 @@
+{
+    "index_patterns":
+    [
+        "INDEX_PREFIX*"
+    ],
+    "template":
+    {
+        "mappings":
+        {
+            "properties":
+            {
+                "geoip":
+                {
+                    "properties":
+                    {
+                        "location":
+                        {
+                            "type": "geo_point"
+                        }
+                    }
+                }
+            }
+        },
+        "settings":
+        {
+            "index.routing.allocation.include.data": "hot"
+        }
+    }
+}

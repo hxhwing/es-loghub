@@ -91,7 +91,7 @@ steps:
     terraform apply --auto-approve
 
 - name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:latest'
-  id: Get ES endpoint and credentials
+  id: Get ES endpoint and credentials, Create Index Template
   entrypoint: /bin/bash
   args:
   - '-c'
@@ -115,10 +115,14 @@ steps:
       es_apikey=$(curl -s --insecure -u elastic:$es_password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     fi
     
+
     echo "=== Write environment into /workspace files for following steps ==="
     echo $es_ip > /workspace/es_ip
     echo $es_password > /workspace/es_password
     echo $es_apikey > /workspace/es_apikey
+
+    echo "=== Write environment into /workspace files for following steps ==="
+    curl --insecure -XPUT ${es_endpoint}/_index_template/httplog -H 'Authorization: ApiKey ${es_apikey}==' -H 'Content-Type: application/json' -d @elasticsearch/index_template.json
 
     echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
     echo "=== Username: elastic; Password: ${es_password}   ==="

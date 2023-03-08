@@ -4,5 +4,5 @@ metadata:
   name: es-apikey
   namespace: NAMESPACE
 type: Opaque
-Data:
+data:
   apikey: ES_APIKEY
