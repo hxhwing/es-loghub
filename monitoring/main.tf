@@ -1,15 +1,15 @@
 
-data "kubectl_file_documents" "secret" {
-  content = file("manifests/apikey.yaml")
-}
+# data "kubectl_file_documents" "secret" {
+#   content = file("manifests/apikey.yaml")
+# }
 
-resource "kubectl_manifest" "secret" {
-  for_each   = data.kubectl_file_documents.secret.manifests
-  yaml_body  = each.value
-  provisioner "local-exec" {
-    command = "sleep 10"
-  }
-}
+# resource "kubectl_manifest" "secret" {
+#   for_each   = data.kubectl_file_documents.secret.manifests
+#   yaml_body  = each.value
+#   provisioner "local-exec" {
+#     command = "sleep 10"
+#   }
+# }
 
 data "kubectl_file_documents" "exporter" {
   content = file("manifests/elasticsearch-exporter.yaml")

@@ -17,12 +17,12 @@ spec:
       containers:
       - name: exporter
         image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0
-        env:
-        - name: ES_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: es-apikey
-              key: apikey
+        # env:
+        # - name: ES_API_KEY
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: es-apikey
+        #       key: apikey
         args:
         - '--es.uri=https://monitor:Prometheus@CLUSTER_NAME-es-internal-http:9200'
         - '--es.ssl-skip-verify'
