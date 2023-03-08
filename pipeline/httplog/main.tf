@@ -26,7 +26,7 @@ resource "google_project_iam_member" "sa-role" {
     "roles/secretmanager.secretAccessor",
     "roles/cloudfunctions.invoker",
     "roles/run.invoker",
-    "roles/storage.admin",
+    # "roles/storage.admin",
   ])
   role    = each.key
   member  = "serviceAccount:${google_service_account.sa.email}"
@@ -43,7 +43,7 @@ resource "google_pubsub_topic" "err-topic" {
 }
 
 resource "google_storage_bucket_object" "object" {
-  name   = "function-httplog.zip"
+  name   = "function-httplog-${data.archive_file.source.output_md5}.zip"
   bucket = data.google_storage_bucket.bucket.name
   source = data.archive_file.source.output_path # Add path to the zipped function source code
 }
