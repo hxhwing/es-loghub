@@ -7,7 +7,7 @@ data "google_storage_bucket" "bucket" {
 data "archive_file" "source" {
   type        = "zip"
   source_dir  = "./src/"
-  output_path = "/tmp/function-dnslog.zip"
+  output_path = "/tmp/function-dnslog-${data.archive_file.source.output_md5}.zip"
 }
 
 resource "random_id" "suffix" {
@@ -43,7 +43,7 @@ resource "google_pubsub_topic" "err-topic" {
 }
 
 resource "google_storage_bucket_object" "object" {
-  name   = "function-dnslog.zip"
+  name   = "function-dnslog-${data.archive_file.source.output_md5}.zip"
   bucket = data.google_storage_bucket.bucket.name
   source = data.archive_file.source.output_path # Add path to the zipped function source code
 }
@@ -129,4 +129,16 @@ resource "google_project_iam_member" "log-writer" {
   project = var.project
   role    = "roles/pubsub.publisher"
   member  = google_logging_organization_sink.sink.writer_identity
+}
+
+output "dnslog-sink" {
+  value = google_logging_organization_sink.sink.id
+}
+
+output "dnslog-topic" {
+  value = google_pubsub_topic.topic.id
+}
+
+output "dnslog-function" {
+  value = google_cloudfunctions2_function.function.id
 }

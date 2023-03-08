@@ -132,7 +132,8 @@ steps:
   - |
     source deployment.conf
     es_apikey=$(cat /workspace/es_apikey)
-
+    echo -n $es_apikey | base64 > es_apikey.b64
+    es_apikey_b64=$(cat es_apikey.b64)
     echo "===Generating manifest of elasticsearch-exporter==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" monitoring/providers.tf
     sed -i "s/REGION_ID/$region/g" monitoring/variables.tf
@@ -140,7 +141,7 @@ steps:
     sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/variables.tf
 
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/apikey.yaml
-    sed -i "s/ES_APIKEY/$es_apikey/g" monitoring/manifests/apikey.yaml
+    sed -i "s/ES_APIKEY/$es_apikey_b64/g" monitoring/manifests/apikey.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/podmonitoring.yaml
