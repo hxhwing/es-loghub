@@ -107,8 +107,8 @@ steps:
     kibana_endpoint="https://$kibana_ip:5601"
 
     echo "===Create Elasticsearch API Key==="
-    es_apikey=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
-    if [ -z "$es_apikey" ]; then
+    es_apikey_exist=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
+    if [ -z "$es_apikey_exist" ]; then
       es_apikey=$(curl -s --insecure -u elastic:$es_password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     else
       echo "===API key already exists==="
@@ -123,8 +123,8 @@ steps:
     echo "=== Create Index Template ==="
     sed -i "s/INDEX_PREFIX/$httplog_index_prefix/g" elasticsearch/index_template.json
 
-    index_template=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_index_template/httplog | grep 'not found')
-    if [ -z "$index_template" ]; then
+    index_template_exist=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_index_template/httplog | grep 'not found')
+    if [ -z "$index_template_exist" ]; then
       echo "===API key already exists==="
     else
       echo "===Creating new template==="
