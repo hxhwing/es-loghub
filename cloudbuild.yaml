@@ -92,7 +92,7 @@ steps:
 
 - name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:latest'
   id: Get ES endpoint and Credentials
-  entrypoint: /bin/sh
+  entrypoint: /bin/bash
   args:
   - '-c'
   - |
