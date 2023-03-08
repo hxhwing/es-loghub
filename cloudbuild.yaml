@@ -111,18 +111,23 @@ steps:
     if [ -z "$es_apikey" ]; then
       es_apikey=$(curl -s --insecure -u elastic:$es_password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
     else
-      curl -s --insecure -u elastic:$es_password -XDELETE ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}'
-      es_apikey=$(curl -s --insecure -u elastic:$es_password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
+      echo "===API key already exists==="
     fi
     
-
+    sleep 2
     echo "=== Write environment into /workspace files for following steps ==="
     echo $es_ip > /workspace/es_ip
     echo $es_password > /workspace/es_password
     echo $es_apikey > /workspace/es_apikey
 
-    echo "=== Write environment into /workspace files for following steps ==="
-    curl --insecure -XPUT ${es_endpoint}/_index_template/httplog -H 'Authorization: ApiKey ${es_apikey}==' -H 'Content-Type: application/json' -d @elasticsearch/index_template.json
+    echo "=== Create Index Template ==="
+    sed -i "s/INDEX_PREFIX/$httplog_index_prefix/g" elasticsearch/index_template.json
+
+    index_template=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_index_template/httplog | grep 'not found')
+    if [ -z "$index_template" ]; then
+      echo "===API key already exists==="
+    else
+    curl -s --insecure -u elastic:$es_password -XPUT ${es_endpoint}/_index_template/httplog -H 'Content-Type: application/json' -d @elasticsearch/index_template.json
 
     echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
     echo "=== Username: elastic; Password: ${es_password}   ==="
@@ -163,7 +168,7 @@ steps:
   - |
     source deployment.conf
     gcloud container clusters get-credentials $cluster_name --region $LOCATION
-    sleep 10s
+    sleep 5s
     kubectl rollout restart deployment elasticsearch-exporter -n $namespace
 
 # Store Elasitcsearch endpoint and credentials into Secret Manager
