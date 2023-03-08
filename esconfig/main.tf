@@ -11,7 +11,7 @@ provider "elasticstack" {
   elasticsearch {
     username  = "elastic"
     password  = "ES_PASSWORD"
-    endpoints = [ES_ENDPOINT]
+    endpoints = ["https://ES_IP:9200"]
     insecure = true
   }
 }

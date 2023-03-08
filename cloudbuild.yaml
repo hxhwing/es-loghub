@@ -128,7 +128,7 @@ steps:
 
     echo "===Generating manifest of Elasticsearch configuration==="
     sed -i "s/ES_PASSWORD/$es_password/g" esconfig/main.tf
-    sed -i "s/ES_ENDPOINT/$es_endpoint/g" esconfig/main.tf
+    sed -i "s/ES_IP/$es_ip/g" esconfig/main.tf
     sed -i "s/INDEX_PREFIX/$httplog_index_prefix/g" esconfig/main.tf
 
     echo "===Creating API key, monitor user, and index template==="
