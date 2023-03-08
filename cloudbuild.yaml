@@ -90,8 +90,8 @@ steps:
     terraform init
     terraform apply --auto-approve
 
-- name: 'hashicorp/terraform:latest'
-  id: Create ES API key, monitor user, and index template
+- name: ' gcr.io/cloud-builders/gcloud'
+  id: Get ES endpoint and Credentials
   entrypoint: 'sh'
   args:
   - '-c'
@@ -105,6 +105,24 @@ steps:
     kibana_ip=$(kubectl get svc kibana-kb-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     kibana_endpoint="https://$kibana_ip:5601"
 
+    echo "=== Write environment into /workspace files for following steps ==="
+    echo $es_ip > /workspace/es_ip
+    echo $es_password > /workspace/es_password
+
+    echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
+    echo "=== Username: elastic; Password: ${es_password}   ==="
+
+- name: 'hashicorp/terraform:latest'
+  id: Create ES API key, monitor user, and index template
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    source deployment.conf
+    es_ip=$(cat /workspace/es_ip)
+    es_password=$(cat /workspace/es_password)
+    es_endpoint="https://${es_ip}:9200"
+
     echo "===Generating manifest of Elasticsearch configuration==="
     sed -i "s/ES_PASSWORD/$es_password/g" esconfig/main.tf
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" esconfig/main.tf
@@ -116,14 +134,7 @@ steps:
     terraform apply --auto-approve
     es_apikey=$(terraform output -raw api_key)
 
-    sleep 2
-    echo "=== Write environment into /workspace files for following steps ==="
-    echo $es_ip > /workspace/es_ip
-    echo $es_password > /workspace/es_password
     echo $es_apikey > /workspace/es_apikey
-
-    echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
-    echo "=== Username: elastic; Password: ${es_password}   ==="
 
 # Setup Managed Prometheus for Elasticsearch monitoring
 - name: 'hashicorp/terraform:latest'
@@ -133,10 +144,6 @@ steps:
   - '-c'
   - |
     source deployment.conf
-    es_ip=$(cat /workspace/es_ip)
-    es_password=$(cat /workspace/es_password)
-    # es_apikey=$(cat /workspace/es_apikey)
-    # es_apikey_b64=$(echo $es_apikey | base64 -w 0)
     
     echo "===Generating manifest of elasticsearch-exporter==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" monitoring/providers.tf
