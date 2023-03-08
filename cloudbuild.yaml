@@ -123,6 +123,9 @@ steps:
     es_password=$(cat /workspace/es_password)
     es_endpoint="https://${es_ip}:9200"
 
+    echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
+    echo "=== Elasticsearch password: ${es_password} ==="
+
     echo "===Generating manifest of Elasticsearch configuration==="
     sed -i "s/ES_PASSWORD/$es_password/g" esconfig/main.tf
     sed -i "s/ES_ENDPOINT/$es_endpoint/g" esconfig/main.tf
