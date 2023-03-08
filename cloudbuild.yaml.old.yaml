@@ -62,7 +62,7 @@ steps:
   - '-c'
   - |
     source deployment.conf    
-    echo "===Generating manifest of Elasticsearch deployment==="
+    echo "===Generating manifest of Elasticsearch==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" elasticsearch/providers.tf
     sed -i "s/REGION_ID/$region/g" elasticsearch/variables.tf
     sed -i "s/PROJECT_ID/$PROJECT_ID/g" elasticsearch/variables.tf
@@ -90,8 +90,8 @@ steps:
     terraform init
     terraform apply --auto-approve
 
-- name: 'hashicorp/terraform:latest'
-  id: Create ES API key, monitor user, and index template
+- name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:latest'
+  id: Get ES endpoint and credentials, Create Index Template
   entrypoint: /bin/bash
   args:
   - '-c'
@@ -102,25 +102,34 @@ steps:
     es_password=$(kubectl get secret ${cluster_name}-es-elastic-user -n es -o go-template='{{.data.elastic | base64decode }}')
     es_ip=$(kubectl get svc ${cluster_name}-es-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     es_endpoint="https://${es_ip}:9200"
+
     kibana_ip=$(kubectl get svc kibana-kb-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     kibana_endpoint="https://$kibana_ip:5601"
 
-    echo "===Generating manifest of Elasticsearch configuration==="
-    sed -i "s/ES_PASSWORD/$es_password/g" esconfig/main.tf
-    sed -i "s/ES_ENDPOINT/$es_endpoint/g" esconfig/main.tf
-    sed -i "s/INDEX_PREFIX/$httplog_index_prefix/g" esconfig/main.tf
-
-    echo "===Creating API key, monitor user, and index template==="
-    cd monitoring
-    terraform init
-    terraform apply --auto-approve
-    es_apikey=$(terraform output -raw api_key)
-
+    echo "===Create Elasticsearch API Key==="
+    es_apikey_exist=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_security/api_key?name=admin | grep false)
+    if [ -z "$es_apikey_exist" ]; then
+      es_apikey=$(curl -s --insecure -u elastic:$es_password -XPOST ${es_endpoint}/_security/api_key?pretty -H 'Content-Type: application/json' -d '{"name": "admin"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['encoded'])")
+    else
+      echo "===API key already exists==="
+    fi
+    
     sleep 2
     echo "=== Write environment into /workspace files for following steps ==="
     echo $es_ip > /workspace/es_ip
     echo $es_password > /workspace/es_password
     echo $es_apikey > /workspace/es_apikey
+
+    echo "=== Create Index Template ==="
+    sed -i "s/INDEX_PREFIX/$httplog_index_prefix/g" elasticsearch/index_template.json
+
+    index_template_exist=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_index_template/httplog | grep 'not found')
+    if [ -z "$index_template_exist" ]; then
+      echo "===API key already exists==="
+    else
+      echo "===Creating new template==="
+      curl -s --insecure -u elastic:$es_password -XPUT ${es_endpoint}/_index_template/httplog -H 'Content-Type: application/json' -d @elasticsearch/index_template.json
+    fi
 
     echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
     echo "=== Username: elastic; Password: ${es_password}   ==="
@@ -133,10 +142,8 @@ steps:
   - '-c'
   - |
     source deployment.conf
-    es_ip=$(cat /workspace/es_ip)
-    es_password=$(cat /workspace/es_password)
-    # es_apikey=$(cat /workspace/es_apikey)
-    # es_apikey_b64=$(echo $es_apikey | base64 -w 0)
+    es_apikey=$(cat /workspace/es_apikey)
+    es_apikey_b64=$(echo $es_apikey | base64 -w 0)
     
     echo "===Generating manifest of elasticsearch-exporter==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" monitoring/providers.tf
@@ -145,7 +152,7 @@ steps:
     sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/variables.tf
 
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/apikey.yaml
-    # sed -i "s/ES_APIKEY/$es_apikey_b64/g" monitoring/manifests/apikey.yaml
+    sed -i "s/ES_APIKEY/$es_apikey_b64/g" monitoring/manifests/apikey.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/podmonitoring.yaml
@@ -154,6 +161,17 @@ steps:
     cd monitoring
     terraform init
     terraform apply --auto-approve
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: Update API key in elasticsearch-exporter
+  entrypoint: /bin/bash
+  args:
+  - '-c'
+  - |
+    source deployment.conf
+    gcloud container clusters get-credentials $cluster_name --region $LOCATION
+    sleep 5s
+    kubectl rollout restart deployment elasticsearch-exporter -n $namespace
 
 # Store Elasitcsearch endpoint and credentials into Secret Manager
 - name: 'hashicorp/terraform:latest'
