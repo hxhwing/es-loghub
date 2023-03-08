@@ -7,7 +7,7 @@ data "google_storage_bucket" "bucket" {
 data "archive_file" "source" {
   type        = "zip"
   source_dir  = "./src/"
-  output_path = "/tmp/function-dnslog-${data.archive_file.source.output_md5}.zip"
+  output_path = "/tmp/function-dnslog.zip"
 }
 
 resource "random_id" "suffix" {
