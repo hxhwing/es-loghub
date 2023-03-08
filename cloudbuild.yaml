@@ -127,7 +127,9 @@ steps:
     if [ -z "$index_template" ]; then
       echo "===API key already exists==="
     else
-    curl -s --insecure -u elastic:$es_password -XPUT ${es_endpoint}/_index_template/httplog -H 'Content-Type: application/json' -d @elasticsearch/index_template.json
+      echo "===Creating new template==="
+      curl -s --insecure -u elastic:$es_password -XPUT ${es_endpoint}/_index_template/httplog -H 'Content-Type: application/json' -d @elasticsearch/index_template.json
+    fi
 
     echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
     echo "=== Username: elastic; Password: ${es_password}   ==="
