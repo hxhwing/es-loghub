@@ -90,7 +90,7 @@ steps:
     terraform init
     terraform apply --auto-approve
 
-- name: 'gcr.io/cloud-builders/gcloud'
+- name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:latest'
   id: Get ES endpoint and Credentials
   entrypoint: /bin/sh
   args:
