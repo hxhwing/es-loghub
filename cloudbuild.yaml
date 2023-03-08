@@ -136,8 +136,10 @@ steps:
     terraform init
     terraform apply --auto-approve
     es_apikey=$(terraform output -raw api_key)
+    monitor_password=$(terraform output -raw password)
 
     echo $es_apikey > /workspace/es_apikey
+    echo $monitor_password > /workspace/monitor_password
 
 # Setup Managed Prometheus for Elasticsearch monitoring
 - name: 'hashicorp/terraform:latest'
@@ -147,6 +149,7 @@ steps:
   - '-c'
   - |
     source deployment.conf
+    monitor_password=$(cat /workspace/monitor_password)
     
     echo "===Generating manifest of elasticsearch-exporter==="
     sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" monitoring/providers.tf
@@ -158,6 +161,7 @@ steps:
     # sed -i "s/ES_APIKEY/$es_apikey_b64/g" monitoring/manifests/apikey.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/manifests/elasticsearch-exporter.yaml
+    sed -i "s/MONITOR_PASSWORD/$monitor_password/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/podmonitoring.yaml
 
     echo "=== Install elasticsearch-exporter and PodMonitoring ==="

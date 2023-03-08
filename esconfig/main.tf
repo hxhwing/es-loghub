@@ -4,6 +4,10 @@ terraform {
       source = "elastic/elasticstack"
       version = "0.5.0"
     }
+    random = {
+      source = "hashicorp/random"
+      version = "3.4.3"
+    }
   }
 }
 
@@ -17,6 +21,12 @@ provider "elasticstack" {
 }
 
 
+resource "random_password" "password" {
+  length           = 8
+  special          = true
+}
+
+
 resource "elasticstack_elasticsearch_security_api_key" "api_key" {
   # Set the name
   name = "admin-key"
@@ -26,7 +36,7 @@ resource "elasticstack_elasticsearch_security_api_key" "api_key" {
 
 resource "elasticstack_elasticsearch_security_user" "monitor" {
   username = "monitor"
-  password = "Prometheus"
+  password = random_password.password.result
   roles    = ["remote_monitoring_collector"]
 
   metadata = jsonencode({})
@@ -63,6 +73,11 @@ resource "elasticstack_elasticsearch_index_template" "template" {
 
 output "api_key" {
   value     = elasticstack_elasticsearch_security_api_key.api_key.encoded
+  sensitive = true
+}
+
+output "password" {
+  value = random_password.password.result
   sensitive = true
 }
 
