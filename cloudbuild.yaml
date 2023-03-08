@@ -92,7 +92,7 @@ steps:
 
 - name: 'hashicorp/terraform:latest'
   id: Create ES API key, monitor user, and index template
-  entrypoint: /bin/bash
+  entrypoint: 'sh'
   args:
   - '-c'
   - |
