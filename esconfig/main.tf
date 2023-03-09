@@ -1,13 +1,13 @@
 
 resource "random_password" "password" {
-  length           = 8
-  special          = false
+  length  = 8
+  special = false
 }
 
 
 resource "elasticstack_elasticsearch_security_api_key" "api_key" {
   # Set the name
-  name = "admin-key"
+  name             = "admin-key"
   role_descriptors = jsonencode({})
 }
 
@@ -26,7 +26,7 @@ resource "elasticstack_elasticsearch_index_template" "auditlog_template" {
 
   # priority       = 42
   index_patterns = ["AUDITLOG_INDEX_PREFIX*"]
-  # data_stream {}
+  data_stream {}
 
   template {
     # alias {
@@ -35,8 +35,8 @@ resource "elasticstack_elasticsearch_index_template" "auditlog_template" {
 
     settings = jsonencode({
       # "index.routing.allocation.include._tier_preference": ["data_hot"],
-      "index.routing.allocation.include.data": "hot",
-      "number_of_replicas":1
+      "index.routing.allocation.include.data" : "hot",
+      "number_of_replicas" : 1
     })
   }
 }
@@ -55,8 +55,8 @@ resource "elasticstack_elasticsearch_index_template" "dnslog_template" {
 
     settings = jsonencode({
       # "index.routing.allocation.include._tier_preference": ["data_hot"],
-      "index.routing.allocation.include.data": "hot",
-      "number_of_replicas":1
+      "index.routing.allocation.include.data" : "hot",
+      "number_of_replicas" : 1
     })
   }
 }
@@ -75,15 +75,15 @@ resource "elasticstack_elasticsearch_index_template" "httplog_template" {
 
     settings = jsonencode({
       # "index.routing.allocation.include._tier_preference": ["data_hot"],
-      "index.routing.allocation.include.data": "hot",
-      "number_of_replicas":1
+      "index.routing.allocation.include.data" : "hot",
+      "number_of_replicas" : 1
     })
     mappings = jsonencode({
       properties : {
-        "geoip": {
-            "properties": {
-              "location":{"type": "geo_point"}
-            }
+        "geoip" : {
+          "properties" : {
+            "location" : { "type" : "geo_point" }
+          }
         }
       }
     })
@@ -97,7 +97,7 @@ output "api_key" {
 }
 
 output "password" {
-  value = random_password.password.result
+  value     = random_password.password.result
   sensitive = true
 }
 
