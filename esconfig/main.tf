@@ -26,7 +26,7 @@ resource "elasticstack_elasticsearch_index_template" "auditlog_template" {
 
   # priority       = 42
   index_patterns = ["AUDITLOG_INDEX_PREFIX*"]
-  data_stream {}
+  # data_stream {}
 
   template {
     # alias {
