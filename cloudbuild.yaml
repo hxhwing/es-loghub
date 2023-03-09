@@ -113,7 +113,7 @@ steps:
     echo "=== Username: elastic; Password: ${es_password}   ==="
 
 - name: 'hashicorp/terraform:latest'
-  id: Create ES API key and Monitor user
+  id: Create ES API key, Monitor user and index templates
   entrypoint: 'sh'
   args:
   - '-c'
@@ -135,7 +135,7 @@ steps:
     sed -i "s/HTTPLOG_INDEX_PREFIX/$httplog_index_prefix/g" esconfig/main.tf
 
 
-    echo "===Creating API key and Monitor user==="
+    echo "===Creating ES API key, Monitor user and index templates==="
     cd esconfig
     terraform init
     terraform apply --auto-approve
