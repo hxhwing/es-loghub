@@ -1,35 +1,4 @@
 
-resource "elasticstack_elasticsearch_index_template" "template" {
-  name = "httplog"
-
-  # priority       = 42
-  index_patterns = ["INDEX_PREFIX*"]
-  data_stream {}
-
-  template {
-    # alias {
-    #   name = "my_template_test"
-    # }
-
-    settings = jsonencode({
-      # "index.routing.allocation.include._tier_preference": ["data_hot"],
-      "number_of_replicas":1
-    })
-
-    mappings = jsonencode({
-      properties : {
-        "geoip": {
-            "properties": {
-              "location":{"type": "geo_point"}
-            }
-        }
-      }
-    })
-  }
-  lifecycle {
-    prevent_destroy = true
-  }
-}
 
 data "google_storage_bucket" "bucket" {
   name = var.bucket_name

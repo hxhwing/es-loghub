@@ -18,7 +18,3 @@ variable "organization" {
   default = "ORGANIZATION_ID"
 }
 
-variable "replica" {
-  type = number
-  default = 1
-}

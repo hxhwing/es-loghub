@@ -25,5 +25,6 @@
         {
             "index.routing.allocation.include.data": "hot"
         }
-    }
+    },
+    "data_stream": {}
 }
