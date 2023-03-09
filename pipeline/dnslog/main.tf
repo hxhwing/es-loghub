@@ -16,6 +16,9 @@ resource "elasticstack_elasticsearch_index_template" "template" {
       "number_of_replicas":1
     })
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 data "google_storage_bucket" "bucket" {

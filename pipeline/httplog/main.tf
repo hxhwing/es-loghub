@@ -26,6 +26,9 @@ resource "elasticstack_elasticsearch_index_template" "template" {
       }
     })
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 data "google_storage_bucket" "bucket" {
