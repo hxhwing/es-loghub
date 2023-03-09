@@ -63,7 +63,7 @@ spec:
     - name: data-hot
       count: HOT_NODE_COUNT
       config:
-          node.roles: ["data_hot", "ingest"]
+          node.roles: ["data", "ingest"]
           node.attr.data: hot
           node.attr.zone: ${ZONE}
           cluster.routing.allocation.awareness.attributes: zone
@@ -102,7 +102,7 @@ spec:
     - name: data-warm
       count: WARM_NODE_COUNT
       config:
-          node.roles: ["data_warm"]
+          node.roles: ["data", "ingest"]
           node.attr.data: warm
           node.attr.zone: ${ZONE}
           cluster.routing.allocation.awareness.attributes: zone
@@ -115,7 +115,7 @@ spec:
             resources:
                 requests:
                     storage: WARM_STORAGE_SIZEGi
-            storageClassName: pd-standard
+            storageClassName: pd-balanced
       podTemplate:
           metadata:
               labels:
