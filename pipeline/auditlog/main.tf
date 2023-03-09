@@ -12,7 +12,7 @@ resource "elasticstack_elasticsearch_index_template" "template" {
     # }
 
     settings = jsonencode({
-      "index.routing.allocation.include._tier_preference": ["data_hot"],
+      # "index.routing.allocation.include._tier_preference": ["data_hot"],
       "number_of_replicas":1
     })
   }
