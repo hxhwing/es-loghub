@@ -123,7 +123,6 @@ resource "google_logging_organization_sink" "sink" {
   #   name = ""
   #   filter = ""
   # }
-  depends_on = [elasticstack_elasticsearch_index_template.template]
 }
 
 resource "google_project_iam_member" "log-writer" {
