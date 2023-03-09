@@ -5,13 +5,11 @@ resource "google_service_account" "sa" {
   display_name = "elasticsearch-sa"
 }
 
-resource "google_project_iam_binding" "sa-role" {
-  project = var.project
-  role    = "roles/storage.admin"
 
-  members = [
-    google_service_account.sa.member,
-  ]
+resource "google_project_iam_member" "sa-role" {
+  role    = "roles/storage.admin"
+  member  = "serviceAccount:${google_service_account.sa.email}"
+  project = var.project
 }
 
 resource "google_service_account_iam_binding" "sa-user" {
@@ -60,8 +58,8 @@ data "kubectl_file_documents" "sc" {
 }
 
 resource "kubectl_manifest" "storageclass" {
-  for_each   = data.kubectl_file_documents.sc.manifests
-  yaml_body  = each.value
+  for_each  = data.kubectl_file_documents.sc.manifests
+  yaml_body = each.value
 }
 
 data "kubectl_file_documents" "es" {
