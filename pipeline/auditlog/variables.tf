@@ -17,3 +17,8 @@ variable "organization" {
   type = string
   default = "ORGANIZATION_ID"
 }
+
+variable "replica" {
+  type = number
+  default = NUMBER_OF_REPLICA
+}

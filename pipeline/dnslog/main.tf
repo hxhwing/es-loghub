@@ -1,4 +1,22 @@
 
+resource "elasticstack_elasticsearch_index_template" "template" {
+  name = "dnslog"
+
+  # priority       = 42
+  index_patterns = ["INDEX_PREFIX*"]
+  data_stream {}
+
+  template {
+    # alias {
+    #   name = "my_template_test"
+    # }
+
+    settings = jsonencode({
+      "index.routing.allocation.include._tier_preference": ["data_hot"],
+      "number_of_replicas":1
+    })
+  }
+}
 
 data "google_storage_bucket" "bucket" {
   name = var.bucket_name
@@ -123,6 +141,7 @@ resource "google_logging_organization_sink" "sink" {
     name = "internal-dns-log"
     filter = "jsonPayload.queryName:\"googleapis.com.\""
   }
+  depends_on = [elasticstack_elasticsearch_index_template.template]
 }
 
 resource "google_project_iam_member" "log-writer" {

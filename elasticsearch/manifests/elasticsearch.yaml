@@ -63,7 +63,7 @@ spec:
     - name: data-hot
       count: HOT_NODE_COUNT
       config:
-          node.roles: ["data", "ingest", "transform"]
+          node.roles: ["data_hot", "ingest"]
           node.attr.data: hot
           node.attr.zone: ${ZONE}
           cluster.routing.allocation.awareness.attributes: zone
@@ -102,7 +102,7 @@ spec:
     - name: data-warm
       count: WARM_NODE_COUNT
       config:
-          node.roles: ["data", "ingest", "transform"]
+          node.roles: ["data_warm"]
           node.attr.data: warm
           node.attr.zone: ${ZONE}
           cluster.routing.allocation.awareness.attributes: zone

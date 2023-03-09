@@ -21,32 +21,33 @@ resource "elasticstack_elasticsearch_security_user" "monitor" {
 }
 
 
-resource "elasticstack_elasticsearch_index_template" "template" {
-  name = "httplog"
+# resource "elasticstack_elasticsearch_index_template" "template" {
+#   name = "httplog"
 
-  # priority       = 42
-  index_patterns = ["INDEX_PREFIX*", "log-*"]
+#   # priority       = 42
+#   index_patterns = ["INDEX_PREFIX*", "log-*"]
+#   data_stream {}
 
-  template {
-    # alias {
-    #   name = "my_template_test"
-    # }
+#   template {
+#     # alias {
+#     #   name = "my_template_test"
+#     # }
 
-    settings = jsonencode({
-      "index.routing.allocation.include.data": "hot"
-    })
+#     settings = jsonencode({
+#       "index.routing.allocation.include.data": "hot"
+#     })
 
-    mappings = jsonencode({
-      properties : {
-        "geoip": {
-            "properties": {
-              "location":{"type": "geo_point"}
-            }
-        }
-      }
-    })
-  }
-}
+#     mappings = jsonencode({
+#       properties : {
+#         "geoip": {
+#             "properties": {
+#               "location":{"type": "geo_point"}
+#             }
+#         }
+#       }
+#     })
+#   }
+# }
 
 
 output "api_key" {
