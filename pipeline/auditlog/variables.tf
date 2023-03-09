@@ -20,5 +20,5 @@ variable "organization" {
 
 variable "replica" {
   type = number
-  default = NUMBER_OF_REPLICA
+  default = 1
 }
