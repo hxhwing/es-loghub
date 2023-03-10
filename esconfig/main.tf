@@ -1,5 +1,10 @@
 
-resource "random_password" "password" {
+resource "random_password" "admin_password" {
+  length  = 8
+  special = false
+}
+
+resource "random_password" "monitor_password" {
   length  = 8
   special = false
 }
@@ -12,9 +17,17 @@ resource "elasticstack_elasticsearch_security_api_key" "api_key" {
 }
 
 
+resource "elasticstack_elasticsearch_security_user" "admin" {
+  username = "admin"
+  password = random_password.admin_password.result
+  roles    = ["superuser"]
+
+  metadata = jsonencode({})
+}
+
 resource "elasticstack_elasticsearch_security_user" "monitor" {
   username = "monitor"
-  password = random_password.password.result
+  password = random_password.monitor_password.result
   roles    = ["remote_monitoring_collector"]
 
   metadata = jsonencode({})
@@ -96,8 +109,13 @@ output "api_key" {
   sensitive = true
 }
 
-output "password" {
-  value     = random_password.password.result
+output "admin_password" {
+  value     = random_password.admin_password.result
+  sensitive = true
+}
+
+output "monitor_password" {
+  value     = random_password.monitor_password.result
   sensitive = true
 }
 

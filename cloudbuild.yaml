@@ -110,7 +110,7 @@ steps:
     echo $es_password > /workspace/es_password
 
     echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
-    echo "=== Username: elastic; Password: ${es_password}   ==="
+    echo "=== Username: admin; Get password from Secret Manager "es_password" ==="
 
 - name: 'hashicorp/terraform:latest'
   id: Create ES API key, Monitor user and index templates
@@ -140,10 +140,12 @@ steps:
     terraform init
     terraform apply --auto-approve
     es_apikey=$(terraform output -raw api_key)
-    monitor_password=$(terraform output -raw password)
+    monitor_password=$(terraform output -raw monitor_password)
+    admin_password=$(terraform output -raw admin_password)
 
     echo $es_apikey > /workspace/es_apikey
     echo $monitor_password > /workspace/monitor_password
+    echo $admin_password > /workspace/admin_password
 
 # Setup Managed Prometheus for Elasticsearch monitoring
 - name: 'hashicorp/terraform:latest'
@@ -183,7 +185,7 @@ steps:
     source deployment.conf
     echo "===Get variables from previous step==="
     es_ip=$(cat /workspace/es_ip)
-    es_password=$(cat /workspace/es_password)
+    es_password=$(cat /workspace/admin_password)
     es_apikey=$(cat /workspace/es_apikey)
 
     # echo "=== Elasticsearch endpoint: ${es_ip} ==="
