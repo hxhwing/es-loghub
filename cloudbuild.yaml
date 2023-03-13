@@ -142,23 +142,23 @@ steps:
   args:
   - '-c'
   - |
-    source deployment.conf
-    es_ip=$(cat /workspace/es_ip)
-    es_password=$(cat /workspace/es_password)
-    es_endpoint="https://${es_ip}:9200"
-
-    # echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
-    # echo "=== Elasticsearch password: ${es_password} ==="
-
-    echo "===Generating manifest of Elasticsearch configuration==="
-    sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" esconfig/providers.tf
-    sed -i "s/ES_PASSWORD/$es_password/g" esconfig/providers.tf
-    sed -i "s/ES_IP/$es_ip/g" esconfig/providers.tf
-    sed -i "s/AUDITLOG_INDEX_PREFIX/$auditlog_index_prefix/g" esconfig/main.tf
-    sed -i "s/DNSLOG_INDEX_PREFIX/$dnslog_index_prefix/g" esconfig/main.tf
-    sed -i "s/HTTPLOG_INDEX_PREFIX/$httplog_index_prefix/g" esconfig/main.tf
-
     if [ "$deploy_elasticsearch" == "true" ]; then
+      source deployment.conf
+      es_ip=$(cat /workspace/es_ip)
+      es_password=$(cat /workspace/es_password)
+      es_endpoint="https://${es_ip}:9200"
+
+      # echo "=== Elasticsearch endpoint: ${es_endpoint} ==="
+      # echo "=== Elasticsearch password: ${es_password} ==="
+
+      echo "===Generating manifest of Elasticsearch configuration==="
+      sed -i "s/BACKEND_BUCKET_NAME/$bucket_name/g" esconfig/providers.tf
+      sed -i "s/ES_PASSWORD/$es_password/g" esconfig/providers.tf
+      sed -i "s/ES_IP/$es_ip/g" esconfig/providers.tf
+      sed -i "s/AUDITLOG_INDEX_PREFIX/$auditlog_index_prefix/g" esconfig/main.tf
+      sed -i "s/DNSLOG_INDEX_PREFIX/$dnslog_index_prefix/g" esconfig/main.tf
+      sed -i "s/HTTPLOG_INDEX_PREFIX/$httplog_index_prefix/g" esconfig/main.tf
+
       echo "===Creating ES API key, User credentials and Index templates==="
       cd esconfig
       terraform init
@@ -173,9 +173,6 @@ steps:
 
     else
       echo "*************** No elasticsearch required ******************"
-      cd esconfig
-      terraform init
-      terraform destroy --auto-approve
     fi
 
 # Setup Managed Prometheus for Elasticsearch monitoring
