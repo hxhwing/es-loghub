@@ -84,11 +84,20 @@ steps:
 
     sed -i "s/NAMESPACE/$namespace/g" elasticsearch/manifests/kibana.yaml
     sed -i "s/KIBANA_VERSION/$kibana_version/g" elasticsearch/manifests/kibana.yaml
-    
-    echo "===Deploy Elasticsearch stacks==="
-    cd elasticsearch
-    terraform init
-    terraform apply --auto-approve
+  
+
+    if [ "$deploy_elasticsearch" == "true" ]; then
+      echo "===Deploy Elasticsearch stacks==="
+      cd elasticsearch
+      terraform init
+      terraform apply --auto-approve
+
+    else
+      echo "*************** No elasticsearch required ******************"
+      cd elasticsearch
+      terraform init
+      terraform destroy --auto-approve
+    fi
 
 - name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:latest'
   id: Get ES endpoint and Credentials
@@ -118,8 +127,14 @@ steps:
     echo $es_ip > /workspace/es_ip
     echo $es_password > /workspace/es_password
 
-    echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
-    echo "=== Username: admin; Get password from Secret Manager "es_password" ==="
+    if [ "$deploy_elasticsearch" == "true" ]; then
+
+      echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
+      echo "=== Username: admin; Get password from Secret Manager "es_password" ==="
+    
+    else
+      echo "*************** No elasticsearch required ******************"
+    fi
 
 - name: 'hashicorp/terraform:latest'
   id: Create ES API key, User credentials and Index templates
@@ -143,17 +158,25 @@ steps:
     sed -i "s/DNSLOG_INDEX_PREFIX/$dnslog_index_prefix/g" esconfig/main.tf
     sed -i "s/HTTPLOG_INDEX_PREFIX/$httplog_index_prefix/g" esconfig/main.tf
 
-    echo "===Creating ES API key, User credentials and Index templates==="
-    cd esconfig
-    terraform init
-    terraform apply --auto-approve
-    es_apikey=$(terraform output -raw api_key)
-    monitor_password=$(terraform output -raw monitor_password)
-    admin_password=$(terraform output -raw admin_password)
+    if [ "$deploy_elasticsearch" == "true" ]; then
+      echo "===Creating ES API key, User credentials and Index templates==="
+      cd esconfig
+      terraform init
+      terraform apply --auto-approve
+      es_apikey=$(terraform output -raw api_key)
+      monitor_password=$(terraform output -raw monitor_password)
+      admin_password=$(terraform output -raw admin_password)
 
-    echo $es_apikey > /workspace/es_apikey
-    echo $monitor_password > /workspace/monitor_password
-    echo $admin_password > /workspace/admin_password
+      echo $es_apikey > /workspace/es_apikey
+      echo $monitor_password > /workspace/monitor_password
+      echo $admin_password > /workspace/admin_password
+
+    else
+      echo "*************** No elasticsearch required ******************"
+      cd esconfig
+      terraform init
+      terraform destroy --auto-approve
+    fi
 
 # Setup Managed Prometheus for Elasticsearch monitoring
 - name: 'hashicorp/terraform:latest'
@@ -178,10 +201,18 @@ steps:
     sed -i "s/MONITOR_PASSWORD/$monitor_password/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/podmonitoring.yaml
 
-    echo "=== Install elasticsearch-exporter and PodMonitoring ==="
-    cd monitoring
-    terraform init
-    terraform apply --auto-approve
+    if [ "$deploy_elasticsearch" == "true" ]; then
+      echo "=== Install elasticsearch-exporter and PodMonitoring ==="
+      cd monitoring
+      terraform init
+      terraform apply --auto-approve
+
+    else
+      echo "*************** No elasticsearch required ******************"
+      cd monitoring
+      terraform init
+      terraform destroy --auto-approve
+    fi
 
 # Store Elasitcsearch endpoint and credentials into Secret Manager
 - name: 'hashicorp/terraform:latest'
@@ -209,10 +240,20 @@ steps:
     sed -i "s/ES_PASSWORD/$es_password/g" secretmanager/main.tf
     sed -i "s/ES_APIKEY/$es_apikey/g" secretmanager/main.tf
 
-    echo "===Store es_ip, es_password, es_apikey into Secret Manager==="
-    cd secretmanager
-    terraform init
-    terraform apply --auto-approve
+    if [ "$deploy_elasticsearch" == "true" ]; then
+      echo "===Store es_ip, es_password, es_apikey into Secret Manager==="
+      cd secretmanager
+      terraform init
+      terraform apply --auto-approve
+
+    else
+      echo "*************** No elasticsearch required ******************"
+      cd secretmanager
+      terraform init
+      terraform destroy --auto-approve
+    fi
+
+
 
 # Create log pipeline for auditlog
 - name: 'hashicorp/terraform:latest'
