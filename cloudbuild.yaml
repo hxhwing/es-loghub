@@ -133,7 +133,7 @@ steps:
       echo "=== Username: admin; Get password from Secret Manager "es_password" ==="
 
     else
-      gsutil rm -rf gs://$bucket_name/terraform/state/esconfig 
+      gsutil rm -rf gs://$bucket_name/terraform/state/esconfig
       echo "*************** No elasticsearch required ******************"
     fi
 
