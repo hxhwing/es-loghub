@@ -116,11 +116,11 @@ steps:
 
     if [ "$deploy_elasticsearch" == "true" ]; then
 
-      echo "===Check cluster green==="
+      echo "===Check cluster status==="
       status=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_cluster/health?pretty | python3 -c "import sys, json; print(json.load(sys.stdin)['status'])")
       while [ "$status" != "green" ]
       do
-        echo "===Cluster is ${status}==="
+        echo "===Cluster is ${status}, waiting==="
         status=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_cluster/health?pretty | python3 -c "import sys, json; print(json.load(sys.stdin)['status'])")
         sleep 10s
       done
@@ -133,6 +133,7 @@ steps:
       echo "=== Username: admin; Get password from Secret Manager "es_password" ==="
 
     else
+      gsutil rm -rf gs://$bucket_name/terraform/state/esconfig 
       echo "*************** No elasticsearch required ******************"
     fi
 
