@@ -114,24 +114,24 @@ steps:
     kibana_ip=$(kubectl get svc kibana-kb-http -n es -o jsonpath='{.status.loadBalancer.ingress[].ip}')
     kibana_endpoint="https://$kibana_ip:5601"
 
-    echo "===Check cluster green==="
-    status=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_cluster/health?pretty | python3 -c "import sys, json; print(json.load(sys.stdin)['status'])")
-    while [ "$status" != "green" ]
-    do
-      echo "===Cluster is ${status}==="
-      status=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_cluster/health?pretty | python3 -c "import sys, json; print(json.load(sys.stdin)['status'])")
-      sleep 10s
-    done
-
-    echo "=== Write environment into /workspace files for following steps ==="
-    echo $es_ip > /workspace/es_ip
-    echo $es_password > /workspace/es_password
-
     if [ "$deploy_elasticsearch" == "true" ]; then
+
+      echo "===Check cluster green==="
+      status=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_cluster/health?pretty | python3 -c "import sys, json; print(json.load(sys.stdin)['status'])")
+      while [ "$status" != "green" ]
+      do
+        echo "===Cluster is ${status}==="
+        status=$(curl -s --insecure -u elastic:$es_password -XGET ${es_endpoint}/_cluster/health?pretty | python3 -c "import sys, json; print(json.load(sys.stdin)['status'])")
+        sleep 10s
+      done
+
+      echo "=== Write environment into /workspace files for following steps ==="
+      echo $es_ip > /workspace/es_ip
+      echo $es_password > /workspace/es_password
 
       echo "=== Access Kibana UI through: ${kibana_endpoint}   ==="
       echo "=== Username: admin; Get password from Secret Manager "es_password" ==="
-    
+
     else
       echo "*************** No elasticsearch required ******************"
     fi
