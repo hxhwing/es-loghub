@@ -142,8 +142,8 @@ steps:
   args:
   - '-c'
   - |
+    source deployment.conf
     if [ "$deploy_elasticsearch" == "true" ]; then
-      source deployment.conf
       es_ip=$(cat /workspace/es_ip)
       es_password=$(cat /workspace/es_password)
       es_endpoint="https://${es_ip}:9200"
