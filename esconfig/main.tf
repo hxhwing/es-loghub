@@ -67,8 +67,8 @@ resource "elasticstack_elasticsearch_index_template" "dnslog_template" {
     # }
 
     settings = jsonencode({
-      # "index.routing.allocation.include._tier_preference": ["data_hot"],
-      "index.routing.allocation.include.data" : "hot",
+      "index.routing.allocation.include._tier_preference" : ["data_warm"],
+      # "index.routing.allocation.include.data" : "hot",
       "number_of_replicas" : 1
     })
   }
