@@ -42,12 +42,12 @@ resource "elasticstack_elasticsearch_index_template" "auditlog_template" {
   # data_stream {}
 
   template {
-    # alias {
-    #   name = "my_template_test"
-    # }
+    alias {
+      name = "auditlog"
+    }
 
     settings = jsonencode({
-      # "index.routing.allocation.include._tier_preference": ["data_hot"],
+      # "index.routing.allocation.include._tier_preference": "data_hot",
       "index.routing.allocation.include.data" : "hot",
       "number_of_replicas" : 1
     })
@@ -62,9 +62,9 @@ resource "elasticstack_elasticsearch_index_template" "dnslog_template" {
   # data_stream {}
 
   template {
-    # alias {
-    #   name = "my_template_test"
-    # }
+    alias {
+      name = "dnslog"
+    }
 
     settings = jsonencode({
       "index.routing.allocation.include._tier_preference" : "data_warm",
@@ -82,9 +82,9 @@ resource "elasticstack_elasticsearch_index_template" "httplog_template" {
   # data_stream {}
 
   template {
-    # alias {
-    #   name = "my_template_test"
-    # }
+    alias {
+      name = "httplog"
+    }
 
     settings = jsonencode({
       # "index.routing.allocation.include._tier_preference": "data_hot",
