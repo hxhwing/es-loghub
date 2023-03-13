@@ -255,8 +255,8 @@ steps:
 # Create log pipeline for auditlog
 - name: 'hashicorp/terraform:latest'
   id: Manage log pipeline for auditlog
-  # waitFor:
-  # - Store Elasitcsearch endpoint and credentials into Secret Manager
+  waitFor:
+  - Store Elasitcsearch endpoint and credentials into Secret Manager
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -288,8 +288,8 @@ steps:
 # Create log pipeline for dnslog
 - name: 'hashicorp/terraform:latest'
   id: Manage log pipeline for dnslog
-  # waitFor:
-  # - Store Elasitcsearch endpoint and credentials into Secret Manager
+  waitFor:
+  - Store Elasitcsearch endpoint and credentials into Secret Manager
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -321,8 +321,8 @@ steps:
 # Create log pipeline for httplog
 - name: 'hashicorp/terraform:latest'
   id: Manage log pipeline for httplog
-  # waitFor:
-  # - Store Elasitcsearch endpoint and credentials into Secret Manager
+  waitFor:
+  - Store Elasitcsearch endpoint and credentials into Secret Manager
   entrypoint: 'sh'
   args: 
   - '-c'
