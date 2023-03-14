@@ -198,6 +198,7 @@ steps:
     sed -i "s/CLUSTER_NAME/$cluster_name/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/MONITOR_PASSWORD/$monitor_password/g" monitoring/manifests/elasticsearch-exporter.yaml
     sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/podmonitoring.yaml
+    sed -i "s/NAMESPACE/$namespace/g" monitoring/manifests/alertrules.yaml
 
     if [ "$deploy_elasticsearch" == "true" ]; then
       echo "=== Install elasticsearch-exporter and PodMonitoring ==="

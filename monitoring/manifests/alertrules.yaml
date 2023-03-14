@@ -2,6 +2,7 @@ apiVersion: monitoring.googleapis.com/v1
 kind: Rules
 metadata:
   name: elasticsearch-rules
+  namespace: NAMESPACE
   labels:
     app.kubernetes.io/component: rules
     app.kubernetes.io/name: elasticsearch-rules

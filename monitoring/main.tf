@@ -16,8 +16,8 @@ data "kubectl_file_documents" "exporter" {
 }
 
 resource "kubectl_manifest" "exporter" {
-  for_each   = data.kubectl_file_documents.exporter.manifests
-  yaml_body  = each.value
+  for_each  = data.kubectl_file_documents.exporter.manifests
+  yaml_body = each.value
   # depends_on = [kubectl_manifest.secret]
   # lifecycle {
   #   replace_triggered_by = [
@@ -32,6 +32,16 @@ data "kubectl_file_documents" "podmonitoring" {
 
 resource "kubectl_manifest" "podmonitoring" {
   for_each   = data.kubectl_file_documents.podmonitoring.manifests
+  yaml_body  = each.value
+  depends_on = [kubectl_manifest.exporter]
+}
+
+data "kubectl_file_documents" "alertrules" {
+  content = file("manifests/alertrules.yaml")
+}
+
+resource "kubectl_manifest" "alertrules" {
+  for_each   = data.kubectl_file_documents.alertrules.manifests
   yaml_body  = each.value
   depends_on = [kubectl_manifest.exporter]
 }
