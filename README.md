@@ -32,16 +32,14 @@ There is a default Service Account for Cloud Build: ```"PROJECT_NUMBER"@cloudbui
 ## 4. Create Cloud Build trigger
 Create one Cloud Build trigger
  1. Use your new created Github or Cloud Source Repository in step2 as trigger.
- 2. Choose Service Account created in step3, by default Cloud Build will use default Compute Engine Service Account.
- 3. Leave all other configuration default
+ 2. Leave all other configuration default
 
 ![build trigger1](images/build-trigger1.png)
-![build trigger2](images/build-trigger2.png)
 
-## 5. Modify configuration to trigger deployment
+## 5. Trigger deployment
 
 ### 5.1 Prepare deloyment configuration
-All components configuration could be managed by ```deployment.conf``` file.
+**All components configuration could be managed by ```deployment.conf``` file.**
 
 You can control:
  1. Whether to create a new GKE cluster
@@ -152,23 +150,23 @@ For GKE node pool, if "true":
 - One new node pool will be created, with node label "app:elasticsearch"
 
 For Elasticsearch:
- - Elasticsearch cluster
+ - Elasticsearch cluster created
     - External LB service type for API access
     - Workload Identity enabled for GCS snapshot
     - One API key for data ingestion, saved in Secret Manager
     - One user for administration, saved in Secret Manager
     - One user for monitoring
     - Index templates for logs
- - Kibana
+ - Kibana created
     - External LB service type for web access
- - Prometheus
+ - Prometheus deployed
     - Prometheus exporter to monitor ES status
     - PodMonitoring to export ES metrics to Cloud Monitoring
 
 For log pipelines:
- - Organization log router for each log type with inclusion and exclusion filter to export logs to Pub/Sub topic
- - Pub/Sub topics for each log type, push logs to Cloud Functions 2nd
- - Cloud Functions 2nd (Cloud Run), process/enrich logs, and deliver to Elasticsearch by API
+ - Organization log router deployed for each log type with inclusion and exclusion filter to export logs to Pub/Sub topic
+ - Pub/Sub topics deployed for each log type, push logs to Cloud Functions 2nd
+ - Cloud Functions 2nd (Cloud Run) deployed for each log type, to process, enrich and deliver logs to Elasticsearch by API
 
 ## 6. Access logs
 
