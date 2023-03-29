@@ -1,4 +1,4 @@
-# Deploy Elasticsearch based loghub on GCP
+# Deploy Elasticsearch based Log Hub on GCP
 
 **You can follow this guide to quickly and automatically deploy a production-ready Log Hub on GCP, including:** 
  1. Elasticsearch cluster on GKE
