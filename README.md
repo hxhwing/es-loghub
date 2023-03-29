@@ -137,6 +137,7 @@ After deployment configuration ready, you can push changes to repository, to tri
 ```
 create_new_cluster=true
 create_new_nodepool=true
+deploy_elasticsearch=true
 auditlog=true
 dnslog=true
 httplog=true
