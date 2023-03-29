@@ -19,25 +19,15 @@ cd es-loghub
 
 ![repo](images/repo.png)
 
-## 3. Create a new service account for deployment
+## 3. Grand permission to Cloud Build Service Account
+
+There is a default Service Account for Cloud Build: ```"PROJECT_NUMBER"@cloudbuild.gserviceaccount.com```
+
+![build-sa](images/build-sa.png)
 
 > **Note**
 >
-> Here "Editor" role is granted to this service account for easy deployment. You should use a fine-grained role in your production environment
-
-```
-gcloud iam service-accounts create cloudbuild-deployment \
-    --display-name="cloudbuild-deployment"
-
-gcloud projects add-iam-policy-binding PROJECT_ID \
-    --member="serviceAccount:cloudbuild-deployment@PROJECT_ID.iam.gserviceaccount.com" \
-    --role="roles/editor"
-
-gcloud projects add-iam-policy-binding winter-inquiry-377308 \
-    --member="serviceAccount:cloudbuild-deployment@winter-inquiry-377308.iam.gserviceaccount.com" \
-    --role="roles/editor"
-
-```
+> Here "Owner" role is granted to this service account for easy deployment. You should use fine-grained permission or create custom Cloud Build Service Account in your production environment
 
 ## 4. Create Cloud Build trigger
 Create one Cloud Build trigger
@@ -175,11 +165,23 @@ For Elasticsearch:
     - PodMonitoring to export ES metrics to Cloud Monitoring
 
 For log pipelines:
- - Log router for each log type with inclusion and exclusion filter to export logs to Pub/Sub topic
+ - Organization log router for each log type with inclusion and exclusion filter to export logs to Pub/Sub topic
  - Pub/Sub topics for each log type, push logs to Cloud Functions 2nd
  - Cloud Functions 2nd (Cloud Run), process/enrich logs, and deliver to Elasticsearch by API
 
-## 6. Update deployment
+## 6. Access logs
+
+### 6.1 Access Kibana
+You can get Kibana endpoint from Cloud Build deployment step(), and get user admin user credentials from Secret Manager(es_admin).
+
+### 6.2 Sample dashboard
+You can import provided sample Kibana dashboards to visualize your Audit and Cloud Load Balancing logs.
+
+![audit-dashboard](images/audit-dashboard.png)
+![http-dashboard](images/http-dashboard.png)
+
+
+## 7. Update deployment
 
 If you want to update some settings, like:
  1. Increase ES node counts
