@@ -172,15 +172,21 @@ For log pipelines:
 
 ## 6. Access logs
 
-### 6.1 Access Kibana
-You can get Kibana endpoint from Cloud Build deployment step(), and get user admin user credentials from Secret Manager(es_admin).
+### 6.1 Kibana login
+You can get Kibana endpoint from Cloud Build step3 logs, and get user admin user credentials from Secret Manager(es_password).
+
+![kibana-endpoint](images/kibana-endpoint.png)
+![es-password](images/es-password.png)
+
+Then access Kibana Web UI, and explore logs.
+![kibana-login](images/kibana-login.png)
+![kibana-index](images/kibana-index.png)
 
 ### 6.2 Sample dashboard
 You can import provided sample Kibana dashboards to visualize your Audit and Cloud Load Balancing logs.
 
 ![audit-dashboard](images/audit-dashboard.png)
 ![http-dashboard](images/http-dashboard.png)
-
 
 ## 7. Update deployment
 
