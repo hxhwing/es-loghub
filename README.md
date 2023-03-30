@@ -17,13 +17,15 @@ cd es-loghub
 
 ## 2. Upload repo to your own Git or Cloud Source Repository
 
-![repo](images/repo.png)
+<!-- ![repo](images/repo.png) -->
+<img src="images/repo.png"  width="50%" height="50%">
 
 ## 3. Grand permission to Cloud Build Service Account
 
 There is a default Service Account for Cloud Build: ```"PROJECT_NUMBER"@cloudbuild.gserviceaccount.com```
 
-![build-sa](images/build-sa.png)
+<!-- ![build-sa](images/build-sa.png) -->
+<img src="images/build-sa.png"  width="50%" height="50%">
 
 > **Note**
 >
@@ -34,7 +36,8 @@ Create one Cloud Build trigger
  1. Use your new created Github or Cloud Source Repository in step2 as trigger.
  2. Leave all other configuration default
 
-![build trigger1](images/build-trigger1.png)
+<!-- ![build trigger1](images/build-trigger1.png) -->
+<img src="images/build-trigger1.png"  width="50%" height="50%">
 
 ## 5. Trigger deployment
 
@@ -173,17 +176,24 @@ For log pipelines:
 ### 6.1 Kibana login
 You can get Kibana endpoint from Cloud Build step3 logs, and get user admin user credentials from Secret Manager(es_password).
 
-![kibana-endpoint](images/kibana-endpoint.png)
-![es-password](images/es-password.png)
+<!-- ![kibana-endpoint](images/kibana-endpoint.png) -->
+<img src="images/kibana-endpoint.png"  width="50%" height="50%">
+
+<!-- ![es-password](images/es-password.png) -->
+<img src="images/es-password.png"  width="50%" height="50%">
 
 Then access Kibana Web UI, and explore logs.
-![kibana-login](images/kibana-login.png)
-![kibana-index](images/kibana-index.png)
+<!-- ![kibana-login](images/kibana-login.png) -->
+<img src="images/kibana-login.png"  width="50%" height="50%">
+
+<!-- ![kibana-index](images/kibana-index.png) -->
+<img src="images/kibana-index.png"  width="50%" height="50%">
 
 ### 6.2 Sample dashboard
 You can import provided sample Kibana dashboards to visualize your Audit and Cloud Load Balancing logs.
 
 ![audit-dashboard](images/audit-dashboard.png)
+
 ![http-dashboard](images/http-dashboard.png)
 
 ## 7. Update deployment
