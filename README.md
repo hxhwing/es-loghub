@@ -24,12 +24,19 @@ cd es-loghub
 
 There is a default Service Account for Cloud Build: ```"PROJECT_NUMBER"@cloudbuild.gserviceaccount.com```
 
-<!-- ![build-sa](images/build-sa.png) -->
-<img src="images/build-sa.png"  width="50%" height="50%">
+### 3.1 Grant Project level permission
+Grant "Owner" role to Cloud Build Service Account for resources deployment.
 
 > **Note**
 >
 > Here "Owner" role is granted to this service account for easy deployment. You should use fine-grained permission or create custom Cloud Build Service Account in your production environment
+
+<!-- ![build-sa](images/build-sa.png) -->
+<img src="images/build-sa.png"  width="50%" height="50%">
+
+### 3.2 Grant Organization-level "Logging" role to Cloud Build for resources deployment.
+To deploy organization log sink, organization-level logging permission is required on Cloud Build Service Account.
+<img src="images/org-permission.png"  width="50%" height="50%">
 
 ## 4. Create Cloud Build trigger
 Create one Cloud Build trigger
